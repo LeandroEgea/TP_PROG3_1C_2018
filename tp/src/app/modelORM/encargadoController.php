@@ -20,22 +20,19 @@ class EncargadoController implements IApiControler
             ->get();
 
         if (count($todosLosEncargados) > 0) {
-            $newResponse = $response->withJson($todosLosEncargados, 200);
-        } else {
-            $newResponse = $response->withJson("No hay encargados", 200);
+            return $response->withJson($todosLosEncargados, 200);
         }
-        return $newResponse;
+        return $response->withJson("No hay encargados", 400);
     }
+
     public function TraerUno($request, $response, $args)
     {
         $id = $args["id"];
         $encargado = Encargado::find($id);
         if ($encargado != null) {
-            $newResponse = $response->withJson($encargado, 200);
-        } else {
-            $newResponse = $response->withJson("No existe encargado con ese ID", 200);
+            return $response->withJson($encargado, 200);
         }
-        return $newResponse;
+        return $response->withJson("ID invalido", 400);
     }
 
     public function CargarUno($request, $response, $args)

@@ -12,7 +12,7 @@ include_once __DIR__ . '/roles.php';
 
 class PedidoProductoController
 {
-    public function verPendientes($codigo, $encargado)
+    public function VerPendientes($codigo, $encargado)
     {
         $rol = Roles::select('cargo')->where('roles.id', '=', $encargado)->get()->toArray();
         $rol = $rol[0]["cargo"];
@@ -36,7 +36,7 @@ class PedidoProductoController
         return $data;
     }
 
-    public function cambiarEstado($codigo, $encargadoID, $estadoInicial, $estadoactual)
+    public function CambiarEstado($codigo, $encargadoID, $estadoInicial, $estadoactual)
     {
         $ret = false;
         $data = PedidoProducto::where('idEstadoProducto', '=', $estadoInicial)

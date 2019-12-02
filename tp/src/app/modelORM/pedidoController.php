@@ -72,13 +72,13 @@ class PedidoController implements IApiControler
     $tiempo = 0; 
     $productoExistente = null; 
     $arrayDeProductosExistentes = "";
-    $mesaDisponible = MesaController::obtenerMesaLibre();
+    $mesaDisponible = MesaController::ObtenerMesaLibre();
     if ($mesaDisponible != null) {
-      MesaController::cambiarEstado($mesaDisponible, 1);
+      MesaController::CambiarEstado($mesaDisponible, 1);
       $pedidoNuevo = new Pedido;
       $pedidoNuevo->idEstadoPedido = 1;
       $pedidoNuevo->codigoMesa = $mesaDisponible;
-      $pedidoNuevo->codigoPedido = PedidoController::generarCodigoTicket();
+      $pedidoNuevo->codigoPedido = PedidoController::GenerarCodigoTicket();
       $pedidoNuevo->productos = $arrayDeParametros["productos"];
       $pedidoNuevo->idEncargado = $token->id;
       $pedidoNuevo->nombreCliente = $arrayDeParametros["nombreCliente"];
@@ -118,7 +118,7 @@ class PedidoController implements IApiControler
         $pedidoNuevo->save();
         $newResponse = $response->withJson('Pedido ' . $pedidoNuevo->codigoPedido . "-" . $pedidoNuevo->codigoMesa . ' cargado', 200);
       } else {
-        MesaController::cambiarEstado($pedidoNuevo->codigoMesa, 4);
+        MesaController::CambiarEstado($pedidoNuevo->codigoMesa, 4);
         PedidoProducto::where("idPedido", "=", $idPedidoCargado)->delete();
         $pedidoNuevo->delete();
         $newResponse = $response->withJson('No se puede cargar un pedido sin productos. Pedido eliminado', 200);
@@ -207,7 +207,7 @@ class PedidoController implements IApiControler
     return $newResponse;
   }
 
-  public function generarCodigoTicket()
+  public function GenerarCodigoTicket()
   {
     $length = 5;
     $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
@@ -219,7 +219,7 @@ class PedidoController implements IApiControler
     return $randomString;
   }
 
-  public function cambiarEstado($codigoPedido, $estado)
+  public function CambiarEstado($codigoPedido, $estado)
   {
     $pedido = Pedido::where('codigoPedido', $codigoPedido)->first();
     $pedido->idEstadoPedido = $estado;
@@ -229,15 +229,15 @@ class PedidoController implements IApiControler
     $pedido->save();
   }
 
-  public function prepararPedido($request, $response, $args)
+  public function PrepararPedido($request, $response, $args)
   {
     $token = $request->getHeader('token');
     $arrayDeParametros = $request->getParsedBody();
     $datos = AutentificadorJWT::ObtenerData($token[0]);
-    $respuesta = PedidoProductoController::cambiarEstado($arrayDeParametros["codigoPedido"], $datos->idRol, 1, 2);
+    $respuesta = PedidoProductoController::CambiarEstado($arrayDeParametros["codigoPedido"], $datos->idRol, 1, 2);
 
     if ($respuesta) {
-      PedidoController::cambiarEstado($arrayDeParametros["codigoPedido"], 2);
+      PedidoController::CambiarEstado($arrayDeParametros["codigoPedido"], 2);
       $newResponse = $response->withJson("Comienza preparacion del pedido", 200);
     } else {
       $newResponse = $response->withJson("No habia pedidos o ya fueron tomados para preparar", 200);
@@ -245,12 +245,12 @@ class PedidoController implements IApiControler
     return $newResponse;
   }
 
-  public function terminarPedido($request, $response, $args)
+  public function TerminarPedido($request, $response, $args)
   {
     $token = $request->getHeader('token');
     $arrayDeParametros = $request->getParsedBody();
     $datos = AutentificadorJWT::ObtenerData($token[0]);
-    $respuesta = PedidoProductoController::cambiarEstado($arrayDeParametros["codigoPedido"], $datos->idRol, 2, 3);
+    $respuesta = PedidoProductoController::CambiarEstado($arrayDeParametros["codigoPedido"], $datos->idRol, 2, 3);
 
     if($respuesta) {
       $data = PedidoProducto::where('codigoPedido', $arrayDeParametros["codigoPedido"])->get();
@@ -261,8 +261,8 @@ class PedidoController implements IApiControler
         }
       }
       if ($completo) {
-        PedidoController::cambiarEstado($arrayDeParametros["codigoPedido"], 3);
-        PedidoProductoController::cambiarEstado($arrayDeParametros["codigoPedido"], $datos->idRol, 2, 3);
+        PedidoController::CambiarEstado($arrayDeParametros["codigoPedido"], 3);
+        PedidoProductoController::CambiarEstado($arrayDeParametros["codigoPedido"], $datos->idRol, 2, 3);
         $newResponse = $response->withJson("Se preparon todos los productos. Pedido listo para servir", 200);
       } 
       else {
@@ -274,17 +274,17 @@ class PedidoController implements IApiControler
     return $newResponse;
   }
 
-  public function servirPedido($request, $response, $args)
+  public function ServirPedido($request, $response, $args)
   {
     $arrayDeParametros = $request->getParsedBody();
     $pedido = Pedido::where('codigoPedido', $arrayDeParametros["codigoPedido"])->first();
     if($pedido->idEstadoPedido == 3) {
       $pedido = pedido::where('codigoPedido', '=', $arrayDeParametros["codigoPedido"])->first();
-      MesaController::cambiarEstado($pedido->codigoMesa, 2);
+      MesaController::CambiarEstado($pedido->codigoMesa, 2);
 
-      PedidoController::cambiarEstado($arrayDeParametros["codigoPedido"], 4);
+      PedidoController::CambiarEstado($arrayDeParametros["codigoPedido"], 4);
 
-      PedidoProductoController::cambiarEstado($arrayDeParametros["codigoPedido"], 3, 3, 4);
+      PedidoProductoController::CambiarEstado($arrayDeParametros["codigoPedido"], 3, 3, 4);
 
       $newResponse = $response->withJson("Pedido entregado", 200);
     } else {
@@ -292,7 +292,7 @@ class PedidoController implements IApiControler
     }
     return $newResponse;
   }
-  public function pedirCuenta($request, $response, $args)
+  public function PedirCuenta($request, $response, $args)
   {
     $total = 0;
     $arrayDeParametros = $request->getParams();
@@ -313,11 +313,11 @@ class PedidoController implements IApiControler
     $cuenta->pedido = $ticket;
     $cuenta->total = $this->total;
     $nuevoRetorno = $response->withJson($cuenta, 200);
-    MesaController::cambiarEstado($pedido->codigoMesa, 3);
+    MesaController::CambiarEstado($pedido->codigoMesa, 3);
     return $nuevoRetorno;
   }
 
-  public function cobrar($request, $response, $args)
+  public function Cobrar($request, $response, $args)
   {
     $total = 0;
     $arrayDeParametros = $request->getParams();
@@ -335,8 +335,8 @@ class PedidoController implements IApiControler
       $encargado = Encargado::where('id', '=', $pedido->idEncargado)->first();
       $ticket->encargado = $encargado->usuario;
       $ticket->save();
-      PedidoController::cambiarEstado($arrayDeParametros['codigoPedido'], 5); //cobrado
-      MesaController::cambiarEstado($pedido->codigoMesa, 4); //cerrada
+      PedidoController::CambiarEstado($arrayDeParametros['codigoPedido'], 5); //cobrado
+      MesaController::CambiarEstado($pedido->codigoMesa, 4); //cerrada
       $newResponse = $response->withJson("Pedido cobrado - Mesa Cerrada", 200);
     } else {
       $newResponse = $response->withJson("Pedido no encontrado", 200);

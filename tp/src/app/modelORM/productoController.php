@@ -103,7 +103,7 @@ class ProductoController implements IApiControler
         return $newResponse;
     }
 
-    public function verPendientes($request, $response, $args)
+    public function VerPendientes($request, $response, $args)
     {
         $token = $request->getHeader('token');
         $arrayDeParametros = $request->getParams();
