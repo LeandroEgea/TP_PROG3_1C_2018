@@ -29,8 +29,10 @@ return function (App $app) {
         $this->post('[/]', EncargadoController::class . ':CargarUno')
             ->add(Middleware::class . ":ValidarToken")
             ->add(Middleware::class . ":EsSocio");
-        $this->put('/{id}[/]', EncargadoController::class . ':ModificarUno');
-        $this->delete('/{id}[/]', EncargadoController::class . ':BorrarUno');
+        $this->post('/put/{id}[/]', EncargadoController::class . ':ModificarUno')
+            ->add(Middleware::class . ":ValidarToken");
+        $this->delete('/{id}[/]', EncargadoController::class . ':BorrarUno')
+            ->add(Middleware::class . ":ValidarToken");
         $this->post('/login[/]', EncargadoController::class . ':IniciarSesion');
     });
 

@@ -47,10 +47,11 @@ class EncargadoController implements IApiControler
         $encargadoNuevo->save();
         return $response->withJson($encargadoNuevo, 200);
     }
+
     public function BorrarUno($request, $response, $args)
     {
         $body = $request->getParsedBody();
-        $id = $body['id'];
+        $id = $args["id"];
         $encargado = Encargado::find($id);
         if ($encargado != null) {
             $encargado->delete();
@@ -59,57 +60,51 @@ class EncargadoController implements IApiControler
         return $response->withJson('El encargado no existe', 200);
     }
 
-//ME QUEDE ACA
-
     public function ModificarUno($request, $response, $args)
     {
         $body = $request->getParsedBody();
-        $id = null;
-        $encargado = null;
-        $contadorModificaciones = 0;
-        if (array_key_exists("id", $body)) {
-            $id = $body['id'];
-            $encargado = Encargado::find($id);
-        }
+        $id = $args["id"];
+        $encargado = Encargado::find($id);
+        $modificaciones = 0;
         if (array_key_exists("nombre", $body) && $id != null && $encargado != null) {
             $encargado->nombre = $body["nombre"];
-            $encargado->usuario = strtolower(substr($body["nombre"], 0, 1)) . strtolower($encargado->apellido);
-            $contadorModificaciones++;
+            $modificaciones++;
         }
         if (array_key_exists("apellido", $body) && $id != null && $encargado != null) {
             $encargado->apellido = $body["apellido"];
-            $encargado->usuario = strtolower(substr($encargado->nombre, 0, 1)) . strtolower($body["apellido"]);
-            $contadorModificaciones++;
+            $modificaciones++;
         }
         if (array_key_exists("usuario", $body) && $id != null && $encargado != null) {
-            $encargado->usuario = (strtolower(substr($encargado->nombre, 0, 1)) . strtolower($encargado->apellido));
-            $contadorModificaciones++;
+            $encargado->usuario = $body["usuario"];
+            $modificaciones++;
         }
         if (array_key_exists("idRol", $body) && $id != null && $encargado != null) {
             $encargado->idRol = $body["idRol"];
-            $contadorModificaciones++;
+            $modificaciones++;
         }
         if (array_key_exists("clave", $body) && $id != null && $encargado != null) {
             $encargado->clave = $body["clave"];
-            $contadorModificaciones++;
+            $modificaciones++;
         }
-        if ($contadorModificaciones > 0 && $contadorModificaciones <= 5 && $id != null && $encargado != null) {
+
+        if ($modificaciones > 0 && $modificaciones <= 5 && $id != null && $encargado != null) {
             $encargado->save();
-            $newResponse = $response->withJson('Encargado ' . $encargado->usuario . ' modificado', 200);
+            return $response->withJson($encargado, 200);
         } else if ($id == null) {
-            $newResponse = $response->withJson('No se introducido un id valido', 200);
+            return $response->withJson('Introduzca ID Valido', 400);
         } else if ($id != null && $encargado == null) {
-            $newResponse = $response->withJson("No hay un encargado con ese ID", 200);
+            return $response->withJson("No se encontro encargado", 400);
         } else {
-            $newResponse = $response->withJson("No se ha modificado ningun campo ", 200);
+            return $response->withJson("No se ha modificado ningun campo", 400);
         }
-        return $newResponse;
     }
 
     public function IniciarSesion($request, $response)
     {
         $body = $request->getParsedBody();
-
+        if (!array_key_exists("usuario", $body) || !array_key_exists("clave", $body)) {
+            return $response->withJson('Introduzca todos los datos', 400);
+        }
         $encargado = Encargado::where('usuario', '=', $body["usuario"])
             ->join('roles', 'encargados.idRol', 'roles.id')
             ->select("encargados.id", "nombre", "apellido", "usuario", "clave", "idRol", "cargo")
@@ -118,14 +113,10 @@ class EncargadoController implements IApiControler
 
         if (count($encargado) == 1 && $encargado[0]["clave"] == $body["clave"]) {
             unset($encargado[0]["clave"]);
-
             $token = AutentificadorJWT::CrearToken($encargado[0]);
-            $newResponse = $response->withJson($token, 200);
+            return $response->withJson($token, 200);
         } else {
-            $newResponse = $response->withJson("Nop", 200);
+            return $response->withJson('Datos invalidos', 401);
         }
-
-        return $newResponse;
     }
-
 }

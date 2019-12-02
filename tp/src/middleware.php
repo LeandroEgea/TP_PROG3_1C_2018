@@ -111,15 +111,16 @@ class Middleware
         $token = $request->getHeader('token');
         if ($token != null) {
             try {
-                if (AutentificadorJWT::VerificarToken($token[0])) {
-                    $encargado = AutentificadorJWT::ObtenerData($token);
+                $token = $request->getHeader('token')[0];
+                if (AutentificadorJWT::VerificarToken($token)) {
+                    $data = AutentificadorJWT::ObtenerData($token);
                     $newResponse = $next($request, $response);
                 }
             } catch (Exception $e) {
-                $newResponse = $response->withJson("Token invalido", 200);
+                $newResponse = $response->withJson("Fallo en la funcion (estoy en ValidarToken)", 500);
             }
         } else {
-            $newResponse = $response->withJson("Token no recibido", 200);
+            $newResponse = $response->withJson("No se ha recibido un token. Verificar e intentar nuevamente", 500);
         }
         return $newResponse;
     }
@@ -131,7 +132,8 @@ class Middleware
             try {
                 $token = $request->getHeader('token')[0];
                 $data = AutentificadorJWT::ObtenerData($token);
-                if ($data->cargo == "socio") {
+
+                if ($data->cargo === "socio") {
                     $newResponse = $next($request, $response);
                 } else {
                     $newResponse = $response->withJson("Solo se admiten socios para esta operacion", 401);
