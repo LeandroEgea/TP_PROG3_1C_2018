@@ -112,6 +112,7 @@ class Middleware
         if ($token != null) {
             try {
                 if (AutentificadorJWT::VerificarToken($token[0])) {
+                    $encargado = AutentificadorJWT::ObtenerData($token);
                     $newResponse = $next($request, $response);
                 }
             } catch (Exception $e) {
@@ -125,25 +126,21 @@ class Middleware
 
     public function EsSocio($request, $response, $next)
     {
-        $token = "token";
-        $parametros = $request->getParsedBody();
-        $token = $parametros["token"];
-        $info["RUTA"] = $request->getUri()->getPath();
-        if (count((array) $token) > 0) {
+        $token = $request->getHeader('token');
+        if ($token != null) {
             try {
-
+                $token = $request->getHeader('token')[0];
                 $data = AutentificadorJWT::ObtenerData($token);
                 if ($data->cargo == "socio") {
                     $newResponse = $next($request, $response);
                 } else {
-                    $newResponse = $response->withJson("Esta accion solo la puede cumplir un socio", 200);
+                    $newResponse = $response->withJson("Solo se admiten socios para esta operacion", 401);
                 }
             } catch (Exception $e) {
-
-                $newResponse = $response->withJson("Ha ocurrido un error. Verificar", 200);
+                $newResponse = $response->withJson("Fallo en la funcion", 500);
             }
         } else {
-            $newResponse = $response->withJson("No se ha recibido un token. Verificar", 200);
+            $newResponse = $response->withJson("No se ha recibido un token. Verificar e intentar nuevamente", 500);
         }
         return $newResponse;
     }
@@ -151,19 +148,20 @@ class Middleware
     public function EsMozo($request, $response, $next)
     {
         $token = $request->getHeader('token');
-        if (count((array) $token) > 0) {
+        if ($token != null) {
             try {
-                $data = AutentificadorJWT::ObtenerData($token[0]);
+                $token = $request->getHeader('token')[0];
+                $data = AutentificadorJWT::ObtenerData($token);
                 if ($data->cargo === "mozo" || $data->cargo === "socio") {
                     $newResponse = $next($request, $response);
                 } else {
-                    $newResponse = $response->withJson("Esta accion solo la puede cumplir un mozo", 200);
+                    $newResponse = $response->withJson("Solo se admiten mozos para esta operacion", 401);
                 }
-            } catch (\Exception $e) {
-                $newResponse = $response->withJson("Ha ocurrido un error Mozo. Verificar" . $e, 200);
+            } catch (Exception $e) {
+                $newResponse = $response->withJson("Fallo en la funcion", 500);
             }
         } else {
-            $newResponse = $response->withJson("No se ha recibido un token. Verificar", 200);
+            $newResponse = $response->withJson("No se ha recibido un token. Verificar e intentar nuevamente", 500);
         }
         return $newResponse;
     }

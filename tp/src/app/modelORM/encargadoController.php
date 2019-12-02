@@ -37,63 +37,60 @@ class EncargadoController implements IApiControler
 
     public function CargarUno($request, $response, $args)
     {
-        $arrayDeParametros = $request->getParsedBody();
+        $body = $request->getParsedBody();
         $encargadoNuevo = new Encargado;
-        $encargadoNuevo->nombre = $arrayDeParametros["nombre"];
-        $encargadoNuevo->apellido = $arrayDeParametros["apellido"];
-        $encargadoNuevo->usuario = strtolower(substr($arrayDeParametros["apellido"], 0, 1)) . strtolower($arrayDeParametros["apellido"]);
-        $encargadoNuevo->clave = $arrayDeParametros["clave"];
-        $encargadoNuevo->idRol = $arrayDeParametros["idRol"];
+        $encargadoNuevo->nombre = $body["nombre"];
+        $encargadoNuevo->apellido = $body["apellido"];
+        $encargadoNuevo->usuario = $body["usuario"];
+        $encargadoNuevo->clave = $body["clave"];
+        $encargadoNuevo->idRol = $body["idRol"];
         $encargadoNuevo->save();
-        $idEncargadoCargado = $encargadoNuevo->id;
-        $newResponse = $response->withJson('Encargado ' . $encargadoNuevo->usuario . ' cargado', 200);
-        return $newResponse;
+        return $response->withJson($encargadoNuevo, 200);
     }
     public function BorrarUno($request, $response, $args)
     {
-        $parametros = $request->getParsedBody();
-        $id = $parametros['id'];
+        $body = $request->getParsedBody();
+        $id = $body['id'];
         $encargado = Encargado::find($id);
-        print("Este " . $encargado);
         if ($encargado != null) {
             $encargado->delete();
-            $newResponse = $response->withJson('Encargado ' . $id . ' borrado', 200);
-        } else {
-            $newResponse = $response->withJson('El encargado no existe', 200);
+            return $response->withJson($encargado, 200);
         }
-        return $newResponse;
+        return $response->withJson('El encargado no existe', 200);
     }
+
+//ME QUEDE ACA
 
     public function ModificarUno($request, $response, $args)
     {
-        $arrayDeParametros = $request->getParsedBody();
+        $body = $request->getParsedBody();
         $id = null;
         $encargado = null;
         $contadorModificaciones = 0;
-        if (array_key_exists("id", $arrayDeParametros)) {
-            $id = $arrayDeParametros['id'];
+        if (array_key_exists("id", $body)) {
+            $id = $body['id'];
             $encargado = Encargado::find($id);
         }
-        if (array_key_exists("nombre", $arrayDeParametros) && $id != null && $encargado != null) {
-            $encargado->nombre = $arrayDeParametros["nombre"];
-            $encargado->usuario = strtolower(substr($arrayDeParametros["nombre"], 0, 1)) . strtolower($encargado->apellido);
+        if (array_key_exists("nombre", $body) && $id != null && $encargado != null) {
+            $encargado->nombre = $body["nombre"];
+            $encargado->usuario = strtolower(substr($body["nombre"], 0, 1)) . strtolower($encargado->apellido);
             $contadorModificaciones++;
         }
-        if (array_key_exists("apellido", $arrayDeParametros) && $id != null && $encargado != null) {
-            $encargado->apellido = $arrayDeParametros["apellido"];
-            $encargado->usuario = strtolower(substr($encargado->nombre, 0, 1)) . strtolower($arrayDeParametros["apellido"]);
+        if (array_key_exists("apellido", $body) && $id != null && $encargado != null) {
+            $encargado->apellido = $body["apellido"];
+            $encargado->usuario = strtolower(substr($encargado->nombre, 0, 1)) . strtolower($body["apellido"]);
             $contadorModificaciones++;
         }
-        if (array_key_exists("usuario", $arrayDeParametros) && $id != null && $encargado != null) {
+        if (array_key_exists("usuario", $body) && $id != null && $encargado != null) {
             $encargado->usuario = (strtolower(substr($encargado->nombre, 0, 1)) . strtolower($encargado->apellido));
             $contadorModificaciones++;
         }
-        if (array_key_exists("idRol", $arrayDeParametros) && $id != null && $encargado != null) {
-            $encargado->idRol = $arrayDeParametros["idRol"];
+        if (array_key_exists("idRol", $body) && $id != null && $encargado != null) {
+            $encargado->idRol = $body["idRol"];
             $contadorModificaciones++;
         }
-        if (array_key_exists("clave", $arrayDeParametros) && $id != null && $encargado != null) {
-            $encargado->clave = $arrayDeParametros["clave"];
+        if (array_key_exists("clave", $body) && $id != null && $encargado != null) {
+            $encargado->clave = $body["clave"];
             $contadorModificaciones++;
         }
         if ($contadorModificaciones > 0 && $contadorModificaciones <= 5 && $id != null && $encargado != null) {
@@ -111,15 +108,15 @@ class EncargadoController implements IApiControler
 
     public function IniciarSesion($request, $response)
     {
-        $arrayDeParametros = $request->getParsedBody();
+        $body = $request->getParsedBody();
 
-        $encargado = Encargado::where('usuario', '=', $arrayDeParametros["usuario"])
+        $encargado = Encargado::where('usuario', '=', $body["usuario"])
             ->join('roles', 'encargados.idRol', 'roles.id')
             ->select("encargados.id", "nombre", "apellido", "usuario", "clave", "idRol", "cargo")
             ->get()
             ->toArray();
 
-        if (count($encargado) == 1 && $encargado[0]["clave"] == $arrayDeParametros["clave"]) {
+        if (count($encargado) == 1 && $encargado[0]["clave"] == $body["clave"]) {
             unset($encargado[0]["clave"]);
 
             $token = AutentificadorJWT::CrearToken($encargado[0]);
