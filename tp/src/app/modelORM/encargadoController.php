@@ -10,7 +10,7 @@ include_once __DIR__ . '/encargado.php';
 include_once __DIR__ . '../../modelAPI/AutentificadorJWT.php';
 include_once __DIR__ . '../../modelAPI/IApiControler.php';
 
-class encargadoController implements IApiControler
+class EncargadoController implements IApiControler
 {
     public function TraerTodos($request, $response, $args)
     {

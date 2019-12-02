@@ -10,7 +10,7 @@ include_once __DIR__ . '/mesa.php';
 include_once __DIR__ . '../../modelAPI/AutentificadorJWT.php';
 include_once __DIR__ . '../../modelAPI/IApiControler.php';
 
-class mesaController implements IApiControler
+class MesaController implements IApiControler
 {
     public function TraerTodos($request, $response, $args)
     {

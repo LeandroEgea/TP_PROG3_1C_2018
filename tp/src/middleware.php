@@ -106,7 +106,7 @@ return function (App $app) {
 
 class Middleware
 {
-    public function validarToken($request, $response, $next)
+    public function ValidarToken($request, $response, $next)
     {
         $token = $request->getHeader('token');
         if ($token != null) {

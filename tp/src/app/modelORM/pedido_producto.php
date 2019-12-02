@@ -1,7 +1,7 @@
 <?php
 namespace App\Models\ORM;
 
-class pedido_producto extends \Illuminate\Database\Eloquent\Model
+class PedidoProducto extends \Illuminate\Database\Eloquent\Model
 {
     protected $idPedido;
     protected $idProducto;

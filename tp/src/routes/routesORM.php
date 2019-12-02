@@ -1,9 +1,9 @@
 <?php
 
-use App\Models\ORM\encargadoController;
-use App\Models\ORM\mesaController;
-use App\Models\ORM\pedidoController;
-use App\Models\ORM\productoController;
+use App\Models\ORM\EncargadoController;
+use App\Models\ORM\MesaController;
+use App\Models\ORM\PedidoController;
+use App\Models\ORM\ProductoController;
 use Slim\App;
 
 include_once __DIR__ . '/../../src/app/modelORM/pedidoController.php';
@@ -15,47 +15,57 @@ return function (App $app) {
     $container = $app->getContainer();
 
     $app->group('/mesas', function () {
-        $this->post('/', mesaController::class . ':CargarUno');
-        $this->post('/baja', mesaController::class . ':BorrarUno');
-        $this->post('/modificar', mesaController::class . ':ModificarUno');
-        $this->get('/', mesaController::class . ':TraerTodos');
-        $this->get('/obtenerMesaLibre', mesaController::class . ':obtenerMesaLibre');
-        $this->get('/{id}', mesaController::class . ':TraerUno');
+        $this->get('[/]', MesaController::class . ':TraerTodos');
+        $this->get('/{id}[/]', MesaController::class . ':TraerUno');
+        $this->post('[/]', MesaController::class . ':CargarUno');
+        $this->put('[/]', MesaController::class . ':ModificarUno');
+        $this->delete('[/]', MesaController::class . ':BorrarUno');
+        $this->get('/libre[/]', MesaController::class . ':ObtenerMesaLibre');
     });
 
     $app->group('/encargados', function () {
-        $this->post('/', encargadoController::class . ':CargarUno')->add(Middleware::class . ":EsSocio")
-            ->add(Middleware::class . ":validarToken");
-        $this->post('/logIn', encargadoController::class . ':IniciarSesion');
-        $this->post('/baja', encargadoController::class . ':BorrarUno');
-        $this->post('/modificar', encargadoController::class . ':ModificarUno');
-        $this->get('/', encargadoController::class . ':TraerTodos');
-        $this->get('/{id}', encargadoController::class . ':TraerUno');
+        $this->get('[/]', EncargadoController::class . ':TraerTodos');
+        $this->get('/{id}[/]', EncargadoController::class . ':TraerUno');
+        $this->post('[/]', EncargadoController::class . ':CargarUno')
+            ->add(Middleware::class . ":ValidarToken")
+            ->add(Middleware::class . ":EsSocio");
+        $this->put('[/]', EncargadoController::class . ':ModificarUno');
+        $this->delete('[/]', EncargadoController::class . ':BorrarUno');
+        $this->post('/login[/]', EncargadoController::class . ':IniciarSesion');
     });
 
     $app->group('/productos', function () {
-        $this->get('/verPendientes', productoController::class . ':verPendientes')->add(Middleware::class . ":validarToken");
-        $this->post('/', productoController::class . ':CargarUno');
-        $this->post('/baja', productoController::class . ':BorrarUno');
-        $this->post('/modificar', productoController::class . ':ModificarUno');
-        $this->get('/', productoController::class . ':TraerTodos');
-        $this->get('/{id}', productoController::class . ':TraerUno');
+        $this->get('[/]', ProductoController::class . ':TraerTodos');
+        $this->get('/{id}[/]', ProductoController::class . ':TraerUno');
+        $this->post('[/]', ProductoController::class . ':CargarUno');
+        $this->put('[/]', ProductoController::class . ':ModificarUno');
+        $this->delete('[/]', ProductoController::class . ':BorrarUno');
+        $this->get('/pendientes[/]', ProductoController::class . ':VerPendientes')
+            ->add(Middleware::class . ":ValidarToken");
     });
 
     $app->group('/pedidos', function () {
-        $this->post('/', pedidoController::class . ':CargarUno')->add(Middleware::class . ":EsMozo")
-            ->add(Middleware::class . ":validarToken");
-        $this->post('/baja', pedidoController::class . ':BorrarUno');
-        $this->post('/modificar', pedidoController::class . ':ModificarUno');
-        $this->get('/', pedidoController::class . ':TraerTodos');
-        $this->get('/traerUno', pedidoController::class . ':TraerUno');
-        $this->post('/prepararPedido', pedidoController::class . ':prepararPedido')->add(Middleware::class . ":validarToken");
-        $this->post('/terminarPedido', pedidoController::class . ':terminarPedido')->add(Middleware::class . ":validarToken");
-        $this->post('/servirPedido', pedidoController::class . ':servirPedido')->add(Middleware::class . ":EsMozo")
-            ->add(Middleware::class . ":validarToken");;
-        $this->get('/pedirCuenta', pedidoController::class . ':pedirCuenta')->add(Middleware::class . ":EsMozo")
-            ->add(Middleware::class . ":validarToken");;
-        $this->get('/cobrar', pedidoController::class . ':cobrar')->add(Middleware::class . ":EsMozo")
-            ->add(Middleware::class . ":validarToken");;
+        //ABM
+        $this->get('[/]', PedidoController::class . ':TraerTodos');
+        $this->get('/{id}[/]', PedidoController::class . ':TraerUno');
+        $this->post('[/]', PedidoController::class . ':CargarUno')
+            ->add(Middleware::class . ":ValidarToken")
+            ->add(Middleware::class . ":EsMozo");
+        $this->put('[/]', PedidoController::class . ':ModificarUno');
+        $this->delete('[/]', PedidoController::class . ':BorrarUno');
+        //Negocio
+        $this->post('/preparar[/]', PedidoController::class . ':PrepararPedido')
+            ->add(Middleware::class . ":ValidarToken");
+        $this->post('/terminar[/]', PedidoController::class . ':TerminarPedido')
+            ->add(Middleware::class . ":ValidarToken");
+        $this->post('/servir[/]', PedidoController::class . ':ServirPedido')
+            ->add(Middleware::class . ":ValidarToken")
+            ->add(Middleware::class . ":EsMozo");
+        $this->get('/cuenta[/]', PedidoController::class . ':PedirCuenta')
+            ->add(Middleware::class . ":ValidarToken")
+            ->add(Middleware::class . ":EsMozo");
+        $this->get('/cobrar[/]', PedidoController::class . ':Cobrar')
+            ->add(Middleware::class . ":ValidarToken")
+            ->add(Middleware::class . ":EsMozo");
     });
 };

@@ -9,7 +9,7 @@ use App\Models\ORM\Producto;
 include_once __DIR__ . '/producto.php';
 include_once __DIR__ . '../../modelAPI/IApiControler.php';
 
-class productoController implements IApiControler
+class ProductoController implements IApiControler
 {
     public function TraerTodos($request, $response, $args)
     {
@@ -108,7 +108,7 @@ class productoController implements IApiControler
         $token = $request->getHeader('token');
         $arrayDeParametros = $request->getParams();
         $datos = AutentificadorJWT::ObtenerData($token[0]);
-        $respuesta = pedido_productoController::verPendientes($arrayDeParametros["codigoPedido"], $datos->idRol);
+        $respuesta = PedidoProductoController::verPendientes($arrayDeParametros["codigoPedido"], $datos->idRol);
         if (count($respuesta) > 0) {
             $newResponse = $response->withJson($respuesta, 200);
         } else {

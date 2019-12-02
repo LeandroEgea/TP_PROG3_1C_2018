@@ -4,7 +4,7 @@ namespace App\Models\ORM;
 
 use App\Models\AutentificadorJWT;
 use App\Models\ORM\Pedido;
-use App\Models\ORM\mesaController;
+use App\Models\ORM\MesaController;
 use App\Models\IApiControler;
 use App\Models\ORM\Ticket;
 use \stdClass;
@@ -20,16 +20,8 @@ use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 
 
-class pedidoController implements IApiControler
+class PedidoController implements IApiControler
 {
-
-  public function Beinvenida($request, $response, $args)
-  {
-    $response->getBody()->write("GET => Bienvenido!!! ,a UTN FRA SlimFramework");
-
-    return $response;
-  }
-
   public function TraerTodos($request, $response, $args)
   {
     $todosLasPedidos = Pedido::all();
@@ -45,10 +37,7 @@ class pedidoController implements IApiControler
     $arrayDeParametros = $request->getParams();
     $codigoMesa = $arrayDeParametros['codigoMesa'];
     $codigoPedido = $arrayDeParametros['codigoPedido'];
-
     try {
-
-
       $pedido = Pedido::join('mesas', 'pedidos.codigoMesa', 'mesas.codigoMesa')
         ->where('codigoPedido', $codigoPedido)
         ->get();
@@ -75,66 +64,62 @@ class pedidoController implements IApiControler
     return $nuevoResp;
   }
 
-  //Pancito, te dejo el codigo servidito y comentadito, para mas placer"
-  //Lea, las variables son mias y les pongo el nombre que quiero
-  //Ale, no se si puede hacer mas facil, si logras hacerlo avisame.
   public function CargarUno($request, $response, $args)
   {
     $token = $request->getHeader('token');
     $arrayDeParametros = $request->getParsedBody();
     $token = AutentificadorJWT::ObtenerData($token[0]);
-    $tiempo = 0; //Para asignar el tiempo se va a tener en cuenta el tiempo mas alto de todos los productos
-    $productoExistente = null; //Se utiliza para verificar en el for si el producto seleccionado elige realmente
-    $arrayDeProductosExistentes = ""; //Aca me guardo los productos realmente existentes
-    $mesaDisponible = mesaController::obtenerMesaLibre();
+    $tiempo = 0; 
+    $productoExistente = null; 
+    $arrayDeProductosExistentes = "";
+    $mesaDisponible = MesaController::obtenerMesaLibre();
     if ($mesaDisponible != null) {
-      mesaController::cambiarEstado($mesaDisponible, 1);
-      $pedidoNuevo = new Pedido; //genero un nuevo pedido
-      $pedidoNuevo->idEstadoPedido = 1; //Inicializo el estado del pedido en 1
-      $pedidoNuevo->codigoMesa = $mesaDisponible; //Obtengo una mesa que este libre (ESTADO CERRADA)
-      $pedidoNuevo->codigoPedido = pedidoController::generarCodigoTicket(); //Auto genero el codigo alfanumerico del pedido
+      MesaController::cambiarEstado($mesaDisponible, 1);
+      $pedidoNuevo = new Pedido;
+      $pedidoNuevo->idEstadoPedido = 1;
+      $pedidoNuevo->codigoMesa = $mesaDisponible;
+      $pedidoNuevo->codigoPedido = PedidoController::generarCodigoTicket();
       $pedidoNuevo->productos = $arrayDeParametros["productos"];
-      $pedidoNuevo->idEncargado = $token->id; //Agarro el id del encargado desde el token
+      $pedidoNuevo->idEncargado = $token->id;
       $pedidoNuevo->nombreCliente = $arrayDeParametros["nombreCliente"];
-      $archivos = $request->getUploadedFiles(); // FALTA MOVER FOTO A CARPETA IMAGENES
+      $archivos = $request->getUploadedFiles();
       $pedidoNuevo->imagen = $archivos["imagen"]->file;
-      $pedidoNuevo->tiempo = 1; //Asigno un tiempo ficticio despues de corrige
+      $pedidoNuevo->tiempo = 1;
       $pedidoNuevo->save();
       $idPedidoCargado = $pedidoNuevo->id;
       $productos = explode(",", $arrayDeParametros["productos"]);
-      /*/////////////////////////---RECORRO TODOS LOS PRODUCTOS VALIDANDO SI EXISTEN O NO---///////////////////////////*/
+
       for ($i = 0; $i < count($productos); $i++) {
-        $productoExistente = Producto::find($productos[$i]); // Busco el producto
-        if ($productoExistente != null) { // Si el producto existe....
+        $productoExistente = Producto::find($productos[$i]);
+        if ($productoExistente != null) {
           if ($i == 0) {
-            $arrayDeProductosExistentes = $arrayDeProductosExistentes . $productos[$i]; //en la primera iteracion me guardo el primer producto y
-            $tiempo = $productoExistente->tiempoPreparacion;                            // su tiempo de preparacion
-          } else if (empty($arrayDeProductosExistentes)) { //Esto valida si en la primera iteracion hubo un producto nulo, asique guarda como primero el segundo
             $arrayDeProductosExistentes = $arrayDeProductosExistentes . $productos[$i];
-          } else {                                          //Si no es la primera vez y el anterior no es nulo, sigue iterando normalmente y agrega coma entre productos
+            $tiempo = $productoExistente->tiempoPreparacion;
+          } else if (empty($arrayDeProductosExistentes)) {
+            $arrayDeProductosExistentes = $arrayDeProductosExistentes . $productos[$i];
+          } else {
             $arrayDeProductosExistentes = $arrayDeProductosExistentes . "," . $productos[$i];
           }
-          /*---------------------------AGREGO CADA PRODUCTO EXISTENTE A LA TABLA PRODUCTO_PEDIDO----------------------------------------------------*/
-          $pedido_producto = new pedido_producto;
-          $pedido_producto->codigoPedido = $pedidoNuevo->codigoPedido;
-          $pedido_producto->idProducto = $productos[$i];
-          $pedido_producto->idEstadoProducto = 1;
-          $pedido_producto->save();
-          if ($tiempo < $productoExistente->tiempoPreparacion) { //Comparo el ultimo tiempo guardado contra el nuevo y si el actual es menor al nuevo, se reemplaza
+
+          $pedidoProducto = new PedidoProducto;
+          $pedidoProducto->codigoPedido = $pedidoNuevo->codigoPedido;
+          $pedidoProducto->idProducto = $productos[$i];
+          $pedidoProducto->idEstadoProducto = 1;
+          $pedidoProducto->save();
+          if ($tiempo < $productoExistente->tiempoPreparacion) {
             $tiempo = $productoExistente->tiempoPreparacion;
           }
-          /*-------------------------------------------------------------------------------*/
         }
       }
-      /*/////////////////////////---FIN DEL FOR-----///////////////////////////*/
+
       if (strlen($arrayDeProductosExistentes) > 0) {
-        $pedidoNuevo->productos = $arrayDeProductosExistentes; //Actualizado la verdadera cantidad de productos existentes
-        $pedidoNuevo->tiempo = $tiempo; //Guardo el tiempo real del pedido
+        $pedidoNuevo->productos = $arrayDeProductosExistentes;
+        $pedidoNuevo->tiempo = $tiempo;
         $pedidoNuevo->save();
         $newResponse = $response->withJson('Pedido ' . $pedidoNuevo->codigoPedido . "-" . $pedidoNuevo->codigoMesa . ' cargado', 200);
       } else {
-        mesaController::cambiarEstado($pedidoNuevo->codigoMesa, 4);
-        pedido_producto::where("idPedido", "=", $idPedidoCargado)->delete();
+        MesaController::cambiarEstado($pedidoNuevo->codigoMesa, 4);
+        PedidoProducto::where("idPedido", "=", $idPedidoCargado)->delete();
         $pedidoNuevo->delete();
         $newResponse = $response->withJson('No se puede cargar un pedido sin productos. Pedido eliminado', 200);
       }
@@ -150,7 +135,7 @@ class pedidoController implements IApiControler
     $pedido = Pedido::find($id);
     if ($pedido != null) {
       $pedido->delete();
-      pedido_producto::where("idPedido", "=", $id)->delete();
+      PedidoProducto::where("idPedido", "=", $id)->delete();
       $newResponse = $response->withJson('Pedido ' . $id . ' borrado', 200);
     } else {
       $newResponse = $response->withJson('El pedido no existe', 200);
@@ -177,16 +162,15 @@ class pedidoController implements IApiControler
     if (array_key_exists("productos", $arrayDeParametros) && $id != null && $pedido != null) {
       $pedido->Productos = $arrayDeParametros["productos"];
       $contadorModificaciones++;
-      //Borra el pedido de productos antiguo y lo reemplaza por el nuevo en 
-      //la tabla producto_pedido
-      pedido_producto::where("idPedido", "=", $id)->delete();
+
+      PedidoProducto::where("idPedido", "=", $id)->delete();
       $productos = explode(",", $arrayDeParametros["productos"]);
       for ($i = 0; $i < count($productos); $i++) {
-        $pedido_producto = new pedido_producto;
-        $pedido_producto->codigoPedido = $pedido->codigo;
-        $pedido_producto->idProducto = $productos[$i];
-        $pedido_producto->idEstadoProducto = 1;
-        $pedido_producto->save();
+        $pedidoProducto = new PedidoProducto;
+        $pedidoProducto->codigoPedido = $pedido->codigo;
+        $pedidoProducto->idProducto = $productos[$i];
+        $pedidoProducto->idEstadoProducto = 1;
+        $pedidoProducto->save();
       }
     }
 
@@ -250,10 +234,10 @@ class pedidoController implements IApiControler
     $token = $request->getHeader('token');
     $arrayDeParametros = $request->getParsedBody();
     $datos = AutentificadorJWT::ObtenerData($token[0]);
-    $respuesta = pedido_productoController::cambiarEstado($arrayDeParametros["codigoPedido"], $datos->idRol, 1, 2);
+    $respuesta = PedidoProductoController::cambiarEstado($arrayDeParametros["codigoPedido"], $datos->idRol, 1, 2);
 
     if ($respuesta) {
-      pedidoController::cambiarEstado($arrayDeParametros["codigoPedido"], 2);
+      PedidoController::cambiarEstado($arrayDeParametros["codigoPedido"], 2);
       $newResponse = $response->withJson("Comienza preparacion del pedido", 200);
     } else {
       $newResponse = $response->withJson("No habia pedidos o ya fueron tomados para preparar", 200);
@@ -266,10 +250,10 @@ class pedidoController implements IApiControler
     $token = $request->getHeader('token');
     $arrayDeParametros = $request->getParsedBody();
     $datos = AutentificadorJWT::ObtenerData($token[0]);
-    $respuesta = pedido_productoController::cambiarEstado($arrayDeParametros["codigoPedido"], $datos->idRol, 2, 3);
+    $respuesta = PedidoProductoController::cambiarEstado($arrayDeParametros["codigoPedido"], $datos->idRol, 2, 3);
 
     if($respuesta) {
-      $data = pedido_producto::where('codigoPedido', $arrayDeParametros["codigoPedido"])->get();
+      $data = PedidoProducto::where('codigoPedido', $arrayDeParametros["codigoPedido"])->get();
       $completo = true;
       foreach ($data as $value) {
         if ($value->idEstadoProducto != 3) {
@@ -277,8 +261,8 @@ class pedidoController implements IApiControler
         }
       }
       if ($completo) {
-        pedidoController::cambiarEstado($arrayDeParametros["codigoPedido"], 3);
-        pedido_productoController::cambiarEstado($arrayDeParametros["codigoPedido"], $datos->idRol, 2, 3);
+        PedidoController::cambiarEstado($arrayDeParametros["codigoPedido"], 3);
+        PedidoProductoController::cambiarEstado($arrayDeParametros["codigoPedido"], $datos->idRol, 2, 3);
         $newResponse = $response->withJson("Se preparon todos los productos. Pedido listo para servir", 200);
       } 
       else {
@@ -296,11 +280,11 @@ class pedidoController implements IApiControler
     $pedido = Pedido::where('codigoPedido', $arrayDeParametros["codigoPedido"])->first();
     if($pedido->idEstadoPedido == 3) {
       $pedido = pedido::where('codigoPedido', '=', $arrayDeParametros["codigoPedido"])->first();
-      mesaController::cambiarEstado($pedido->codigoMesa, 2);
+      MesaController::cambiarEstado($pedido->codigoMesa, 2);
 
-      pedidoController::cambiarEstado($arrayDeParametros["codigoPedido"], 4);
+      PedidoController::cambiarEstado($arrayDeParametros["codigoPedido"], 4);
 
-      pedido_productoController::cambiarEstado($arrayDeParametros["codigoPedido"], 3, 3, 4);
+      PedidoProductoController::cambiarEstado($arrayDeParametros["codigoPedido"], 3, 3, 4);
 
       $newResponse = $response->withJson("Pedido entregado", 200);
     } else {
@@ -313,7 +297,7 @@ class pedidoController implements IApiControler
     $total = 0;
     $arrayDeParametros = $request->getParams();
     $pedido = Pedido::where('codigoPedido', '=', $arrayDeParametros['codigoPedido'])->first();
-    $productos = pedido_producto::join('productos', 'productos.id', 'productos_pedidos.idProducto')
+    $productos = PedidoProducto::join('productos', 'productos.id', 'productos_pedidos.idProducto')
       ->where('codigoPedido', '=', $arrayDeParametros['codigoPedido'])->get();
     $ticket = [];
     foreach ($productos as $producto) {
@@ -329,7 +313,7 @@ class pedidoController implements IApiControler
     $cuenta->pedido = $ticket;
     $cuenta->total = $this->total;
     $nuevoRetorno = $response->withJson($cuenta, 200);
-    mesaController::cambiarEstado($pedido->codigoMesa, 3);
+    MesaController::cambiarEstado($pedido->codigoMesa, 3);
     return $nuevoRetorno;
   }
 
@@ -341,7 +325,7 @@ class pedidoController implements IApiControler
     if ($pedido != null && $pedido->idEstadoPedido == 4) {
       $ticket = new Ticket();
       $ticket->codigoPedido = $pedido->codigoPedido;
-      $productos = pedido_producto::join('productos', 'productos.id', 'productos_pedidos.idProducto')
+      $productos = PedidoProducto::join('productos', 'productos.id', 'productos_pedidos.idProducto')
         ->where('codigoPedido', '=', $arrayDeParametros['codigoPedido'])->get();
       foreach ($productos as $producto) {
         $total = $total + $producto->precio;
@@ -351,13 +335,12 @@ class pedidoController implements IApiControler
       $encargado = Encargado::where('id', '=', $pedido->idEncargado)->first();
       $ticket->encargado = $encargado->usuario;
       $ticket->save();
-      pedidoController::cambiarEstado($arrayDeParametros['codigoPedido'], 5); //cobrado
-      mesaController::cambiarEstado($pedido->codigoMesa, 4); //cerrada
+      PedidoController::cambiarEstado($arrayDeParametros['codigoPedido'], 5); //cobrado
+      MesaController::cambiarEstado($pedido->codigoMesa, 4); //cerrada
       $newResponse = $response->withJson("Pedido cobrado - Mesa Cerrada", 200);
     } else {
       $newResponse = $response->withJson("Pedido no encontrado", 200);
     }
-
     return $newResponse;
   }
 }
