@@ -114,6 +114,7 @@ class Middleware
                 $token = $request->getHeader('token')[0];
                 if (AutentificadorJWT::VerificarToken($token)) {
                     $data = AutentificadorJWT::ObtenerData($token);
+                    $request = $request->withAttribute('tokenData', $data);
                     $newResponse = $next($request, $response);
                 }
             } catch (Exception $e) {

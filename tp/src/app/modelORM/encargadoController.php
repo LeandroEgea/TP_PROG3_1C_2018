@@ -37,6 +37,7 @@ class EncargadoController implements IApiControler
 
     public function CargarUno($request, $response, $args)
     {
+        //TODO: Guard
         $body = $request->getParsedBody();
         $encargadoNuevo = new Encargado;
         $encargadoNuevo->nombre = $body["nombre"];
@@ -50,7 +51,6 @@ class EncargadoController implements IApiControler
 
     public function BorrarUno($request, $response, $args)
     {
-        $body = $request->getParsedBody();
         $id = $args["id"];
         $encargado = Encargado::find($id);
         if ($encargado != null) {
@@ -64,39 +64,40 @@ class EncargadoController implements IApiControler
     {
         $body = $request->getParsedBody();
         $id = $args["id"];
+        if ($id == null) {
+            return $response->withJson('Introduzca ID', 400);
+        }
         $encargado = Encargado::find($id);
-        $modificaciones = 0;
-        if (array_key_exists("nombre", $body) && $id != null && $encargado != null) {
-            $encargado->nombre = $body["nombre"];
-            $modificaciones++;
-        }
-        if (array_key_exists("apellido", $body) && $id != null && $encargado != null) {
-            $encargado->apellido = $body["apellido"];
-            $modificaciones++;
-        }
-        if (array_key_exists("usuario", $body) && $id != null && $encargado != null) {
-            $encargado->usuario = $body["usuario"];
-            $modificaciones++;
-        }
-        if (array_key_exists("idRol", $body) && $id != null && $encargado != null) {
-            $encargado->idRol = $body["idRol"];
-            $modificaciones++;
-        }
-        if (array_key_exists("clave", $body) && $id != null && $encargado != null) {
-            $encargado->clave = $body["clave"];
-            $modificaciones++;
+        if ($encargado == null) {
+            return $response->withJson("No se encontro encargado", 400);
         }
 
-        if ($modificaciones > 0 && $modificaciones <= 5 && $id != null && $encargado != null) {
+        $modificado = false;
+        if (array_key_exists("nombre", $body)) {
+            $encargado->nombre = $body["nombre"];
+            $modificado = true;
+        }
+        if (array_key_exists("apellido", $body)) {
+            $encargado->apellido = $body["apellido"];
+            $modificado = true;
+        }
+        if (array_key_exists("usuario", $body)) {
+            $encargado->usuario = $body["usuario"];
+            $modificado = true;
+        }
+        if (array_key_exists("idRol", $body)) {
+            $encargado->idRol = $body["idRol"];
+            $modificado = true;
+        }
+        if (array_key_exists("clave", $body)) {
+            $encargado->clave = $body["clave"];
+            $modificado = true;
+        }
+        if ($modificado === true) {
             $encargado->save();
             return $response->withJson($encargado, 200);
-        } else if ($id == null) {
-            return $response->withJson('Introduzca ID Valido', 400);
-        } else if ($id != null && $encargado == null) {
-            return $response->withJson("No se encontro encargado", 400);
-        } else {
-            return $response->withJson("No se ha modificado ningun campo", 400);
         }
+        return $response->withJson("No se ha modificado ningun campo", 400);
     }
 
     public function IniciarSesion($request, $response)

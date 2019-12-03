@@ -2,7 +2,6 @@
 
 namespace App\Models\ORM;
 
-use App\Models\AutentificadorJWT;
 use App\Models\IApiControler;
 use App\Models\ORM\Producto;
 
@@ -13,107 +12,97 @@ class ProductoController implements IApiControler
 {
     public function TraerTodos($request, $response, $args)
     {
-        $todosLosProductos = Producto::all();
-        if (count($todosLosProductos) > 0) {
-            $newResponse = $response->withJson($todosLosProductos, 200);
-        } else {
-            $newResponse = $response->withJson("No hay productos", 200);
+        $productos = Producto::all();
+        if (count($productos) > 0) {
+            return $response->withJson($productos, 200);
         }
-        return $newResponse;
+        return $response->withJson("No hay productos cargados", 400);
     }
+
     public function TraerUno($request, $response, $args)
     {
         $id = $args["id"];
         $producto = Producto::find($id);
         if ($producto != null) {
-            $newResponse = $response->withJson($producto, 200);
-        } else {
-            $newResponse = $response->withJson("No existe producto con ese ID", 200);
+            return $response->withJson($producto, 200);
         }
-        return $newResponse;
+        return $response->withJson("ID invalido", 400);
     }
 
     public function CargarUno($request, $response, $args)
     {
-        $arrayDeParametros = $request->getParsedBody();
+        //TODO: Guard
+        $body = $request->getParsedBody();
         $productoNuevo = new Producto;
-        $productoNuevo->descripcion = $arrayDeParametros["descripcion"];
-        $productoNuevo->precio = $arrayDeParametros["precio"];
-        $productoNuevo->idRol = $arrayDeParametros["idRol"];
-        $productoNuevo->tiempoPreparacion = $arrayDeParametros["tiempoPreparacion"];
+        $productoNuevo->descripcion = $body["descripcion"];
+        $productoNuevo->precio = $body["precio"];
+        $productoNuevo->idRol = $body["idRol"];
+        $productoNuevo->tiempoPreparacion = $body["tiempoPreparacion"];
         $productoNuevo->save();
         $idProductoCargado = $productoNuevo->id;
-        $newResponse = $response->withJson('Producto ' . $idProductoCargado . ' cargado', 200);
-        return $newResponse;
+        return $response->withJson($productoNuevo, 200);
     }
+
     public function BorrarUno($request, $response, $args)
     {
-        $parametros = $request->getParsedBody();
-        $id = $parametros['id'];
+        $id = $args["id"];
         $producto = Producto::find($id);
         if ($producto != null) {
             $producto->delete();
-            $newResponse = $response->withJson('Producto ' . $id . ' borrado', 200);
-        } else {
-            $newResponse = $response->withJson('El producto no existe', 200);
+            return $response->withJson($producto, 200);
         }
-        return $newResponse;
+        return $response->withJson('El producto no existe', 400);
     }
 
     public function ModificarUno($request, $response, $args)
     {
-        $arrayDeParametros = $request->getParsedBody();
-        $id = null;
-        $producto = null;
-        $contadorModificaciones = 0;
-        if (array_key_exists("id", $arrayDeParametros)) {
-            $id = $arrayDeParametros['id'];
-            $producto = Producto::find($id);
+        $body = $request->getParsedBody();
+        $id = $args["id"];
+        if ($id == null) {
+            return $response->withJson('Introduzca ID', 400);
         }
-        if (array_key_exists("descripcion", $arrayDeParametros) && $id != null && $producto != null) {
-            $producto->descripcion = $arrayDeParametros["descripcion"];
-            $contadorModificaciones++;
+        $producto = Producto::find($id);
+        if ($producto == null) {
+            return $response->withJson("No se encontro producto", 400);
         }
-        if (array_key_exists("precio", $arrayDeParametros) && $id != null && $producto != null) {
-            $producto->precio = $arrayDeParametros["precio"];
-            $contadorModificaciones++;
+
+        $modificado = false;
+        if (array_key_exists("descripcion", $body)) {
+            $producto->descripcion = $body["descripcion"];
+            $modificado = true;
         }
-        if (array_key_exists("tipo", $arrayDeParametros) && $id != null && $producto != null) {
-            $producto->tipo = $arrayDeParametros["tipo"];
-            $contadorModificaciones++;
+        if (array_key_exists("precio", $body)) {
+            $producto->precio = $body["precio"];
+            $modificado = true;
         }
-        if (array_key_exists("idRol", $arrayDeParametros) && $id != null && $producto != null) {
-            $producto->idRol = $arrayDeParametros["idRol"];
-            $contadorModificaciones++;
+        if (array_key_exists("tipo", $body)) {
+            $producto->tipo = $body["tipo"];
+            $modificado = true;
         }
-        if (array_key_exists("tiempoPreparacion", $arrayDeParametros) && $id != null && $producto != null) {
-            $producto->tiempoPreparacion = $arrayDeParametros["tiempoPreparacion"];
-            $contadorModificaciones++;
+        if (array_key_exists("idRol", $body)) {
+            $producto->idRol = $body["idRol"];
+            $modificado = true;
         }
-        if ($contadorModificaciones > 0 && $contadorModificaciones <= 4 && $id != null && $producto != null) {
-            $producto->save();
-            $newResponse = $response->withJson('Producto ' . $id . ' modificado', 200);
-        } else if ($id == null) {
-            $newResponse = $response->withJson('No se introducido un id valido', 200);
-        } else if ($id != null && $producto == null) {
-            $newResponse = $response->withJson("No hay un producto con ese ID", 200);
-        } else {
-            $newResponse = $response->withJson("No se ha modificado ningun campo ", 200);
+        if (array_key_exists("tiempoPreparacion", $body)) {
+            $producto->tiempoPreparacion = $body["tiempoPreparacion"];
+            $modificado = true;
         }
-        return $newResponse;
+        if ($modificado === true) {
+            $encargado->save();
+            return $response->withJson($encargado, 200);
+        }
+        return $response->withJson("No se ha modificado ningun campo", 400);
     }
 
     public function VerPendientes($request, $response, $args)
     {
-        $token = $request->getHeader('token');
-        $arrayDeParametros = $request->getParams();
-        $datos = AutentificadorJWT::ObtenerData($token[0]);
-        $respuesta = PedidoProductoController::verPendientes($arrayDeParametros["codigoPedido"], $datos->idRol);
+        $tokenData = $request->getAttribute('tokenData');
+        $body = $request->getParams(); //???
+        $respuesta = PedidoProductoController::VerPendientes($body["codigoPedido"], $tokenData->idRol);
         if (count($respuesta) > 0) {
-            $newResponse = $response->withJson($respuesta, 200);
+            return $response->withJson($respuesta, 200);
         } else {
-            $newResponse = $response->withJson("No hay pedidos pendientes para el encargado", 200);
+            return $response->withJson("No hay pedidos pendientes para el encargado", 400);
         }
-        return $newResponse;
     }
 }
