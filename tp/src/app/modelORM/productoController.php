@@ -3,9 +3,11 @@
 namespace App\Models\ORM;
 
 use App\Models\IApiControler;
+use App\Models\ORM\PedidoProductoController;
 use App\Models\ORM\Producto;
 
 include_once __DIR__ . '/producto.php';
+include_once __DIR__ . '/pedido_productoController.php';
 include_once __DIR__ . '../../modelAPI/IApiControler.php';
 
 class ProductoController implements IApiControler
@@ -75,10 +77,6 @@ class ProductoController implements IApiControler
             $producto->precio = $body["precio"];
             $modificado = true;
         }
-        if (array_key_exists("tipo", $body)) {
-            $producto->tipo = $body["tipo"];
-            $modificado = true;
-        }
         if (array_key_exists("idRol", $body)) {
             $producto->idRol = $body["idRol"];
             $modificado = true;
@@ -88,8 +86,8 @@ class ProductoController implements IApiControler
             $modificado = true;
         }
         if ($modificado === true) {
-            $encargado->save();
-            return $response->withJson($encargado, 200);
+            $producto->save();
+            return $response->withJson($producto, 200);
         }
         return $response->withJson("No se ha modificado ningun campo", 400);
     }
@@ -97,10 +95,9 @@ class ProductoController implements IApiControler
     public function VerPendientes($request, $response, $args)
     {
         $tokenData = $request->getAttribute('tokenData');
-        $body = $request->getParams(); //???
-        $respuesta = PedidoProductoController::VerPendientes($body["codigoPedido"], $tokenData->idRol);
-        if (count($respuesta) > 0) {
-            return $response->withJson($respuesta, 200);
+        $pendientes = PedidoProductoController::VerPendientes($tokenData->cargo);
+        if ($pendientes != null && count($pendientes) > 0) {
+            return $response->withJson($pendientes, 200);
         } else {
             return $response->withJson("No hay pedidos pendientes para el encargado", 400);
         }

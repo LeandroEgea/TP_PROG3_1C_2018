@@ -40,7 +40,7 @@ return function (App $app) {
         $this->get('[/]', ProductoController::class . ':TraerTodos');
         $this->get('/get/{id}[/]', ProductoController::class . ':TraerUno');
         $this->post('[/]', ProductoController::class . ':CargarUno');
-        $this->put('/{id}[/]', ProductoController::class . ':ModificarUno');
+        $this->post('/put/{id}[/]', ProductoController::class . ':ModificarUno');
         $this->delete('/{id}[/]', ProductoController::class . ':BorrarUno');
         $this->get('/pendientes[/]', ProductoController::class . ':VerPendientes')
             ->add(Middleware::class . ":ValidarToken");

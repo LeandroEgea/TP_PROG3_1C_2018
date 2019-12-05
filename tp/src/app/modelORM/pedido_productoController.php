@@ -4,7 +4,6 @@ namespace App\Models\ORM;
 
 use App\Models\ORM\PedidoProducto;
 use App\Models\ORM\Producto;
-use App\Models\ORM\Roles;
 
 include_once __DIR__ . '/pedido_producto.php';
 include_once __DIR__ . '/producto.php';
@@ -12,25 +11,22 @@ include_once __DIR__ . '/roles.php';
 
 class PedidoProductoController
 {
-    public function VerPendientes($codigo, $encargado)
+    public function VerPendientes($cargo)
     {
-        $rol = Roles::select('cargo')->where('roles.id', '=', $encargado)->get()->toArray();
-        $rol = $rol[0]["cargo"];
-
-        if ($rol == "socio") {
+        if ($cargo == "socio") {
             $data = PedidoProducto::join('productos', 'productos_pedidos.idProducto', 'productos.id')
-                ->join('roles', 'roles.id', 'productos.idRol')
+                ->join('pedidos', 'productos_pedidos.idPedido', 'pedidos.id')
+                ->join('roles', 'productos.idRol', 'roles.id')
                 ->where('productos_pedidos.idEstadoProducto', '=', '1')
-                ->where('codigoPedido', '=', $codigo)
-                ->select('codigoPedido', 'productos.descripcion', 'cargo')
+                ->select('pedidos.codigoPedido', 'pedidos.codigoMesa', 'productos.descripcion', 'roles.cargo')
                 ->get();
         } else {
             $data = PedidoProducto::join('productos', 'productos_pedidos.idProducto', 'productos.id')
-                ->join('roles', 'roles.id', 'productos.idRol')
+                ->join('pedidos', 'productos_pedidos.idPedido', 'pedidos.id')
+                ->join('roles', 'productos.idRol', 'roles.id')
                 ->where('productos_pedidos.idEstadoProducto', '=', '1')
-                ->where('productos.idRol', '=', $encargado)
-                ->where('codigoPedido', '=', $codigo)
-                ->select('codigoPedido', 'productos.descripcion', 'cargo')
+                ->where('roles.cargo', '=', $cargo)
+                ->select('codigoPedido', 'codigoMesa', 'productos.descripcion')
                 ->get();
         }
         return $data;
