@@ -7,26 +7,25 @@ use App\Models\ORM\Producto;
 
 include_once __DIR__ . '/pedido_producto.php';
 include_once __DIR__ . '/producto.php';
-include_once __DIR__ . '/roles.php';
 
 class PedidoProductoController
 {
     public function VerPendientes($cargo)
     {
         if ($cargo == "socio") {
-            $data = PedidoProducto::join('productos', 'productos_pedidos.idProducto', 'productos.id')
-                ->join('pedidos', 'productos_pedidos.idPedido', 'pedidos.id')
+            $data = PedidoProducto::join('productos', 'pedidos_productos.idProducto', 'productos.id')
+                ->join('pedidos', 'pedidos_productos.idPedido', 'pedidos.id')
                 ->join('roles', 'productos.idRol', 'roles.id')
-                ->where('productos_pedidos.idEstadoProducto', '=', '1')
+                ->where('pedidos_productos.idEstadoProducto', '=', '1')
                 ->select('pedidos.codigoPedido', 'pedidos.codigoMesa', 'productos.descripcion', 'roles.cargo')
                 ->get();
         } else {
-            $data = PedidoProducto::join('productos', 'productos_pedidos.idProducto', 'productos.id')
-                ->join('pedidos', 'productos_pedidos.idPedido', 'pedidos.id')
+            $data = PedidoProducto::join('productos', 'pedidos_productos.idProducto', 'productos.id')
+                ->join('pedidos', 'pedidos_productos.idPedido', 'pedidos.id')
                 ->join('roles', 'productos.idRol', 'roles.id')
-                ->where('productos_pedidos.idEstadoProducto', '=', '1')
+                ->where('pedidos_productos.idEstadoProducto', '=', '1')
                 ->where('roles.cargo', '=', $cargo)
-                ->select('codigoPedido', 'codigoMesa', 'productos.descripcion')
+                ->select('pedidos.codigoPedido', 'pedidos.codigoMesa', 'productos.descripcion')
                 ->get();
         }
         return $data;
