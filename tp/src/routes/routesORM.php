@@ -49,12 +49,12 @@ return function (App $app) {
     $app->group('/pedidos', function () {
         //ABM
         $this->get('[/]', PedidoController::class . ':TraerTodos');
-        $this->get('/get/{id}[/]', PedidoController::class . ':TraerUno');
+        $this->get('/get/{codigo}[/]', PedidoController::class . ':TraerUno');
         $this->post('[/]', PedidoController::class . ':CargarUno')
             ->add(Middleware::class . ":ValidarToken")
             ->add(Middleware::class . ":EsMozo");
-        $this->put('/{id}[/]', PedidoController::class . ':ModificarUno');
-        $this->delete('/{id}[/]', PedidoController::class . ':BorrarUno');
+        $this->put('/{codigo}[/]', PedidoController::class . ':ModificarUno');
+        $this->delete('/{codigo}[/]', PedidoController::class . ':BorrarUno');
         //Negocio
         $this->post('/preparar[/]', PedidoController::class . ':PrepararPedido')
             ->add(Middleware::class . ":ValidarToken");

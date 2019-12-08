@@ -4,8 +4,8 @@ namespace App\Models\ORM;
 class Pedido extends \Illuminate\Database\Eloquent\Model
 {
     protected $idEstadoPedido;
+    protected $codigoPedido;
     protected $codigoMesa;
-    protected $productos;
     protected $idEncargado;
     protected $nombreCliente;
     protected $imagen;
