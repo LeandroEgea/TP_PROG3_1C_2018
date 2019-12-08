@@ -22,7 +22,7 @@ class MesaController implements IApiControler
 
     public function ObtenerMesaLibreResponse($request, $response, $args)
     {
-        $mesaLibre = Mesa::where("idEstadoMesa", "=", "4") //4 Mesa Libre
+        $mesaLibre = Mesa::where("idEstadoMesa", "=", "4") //4 = Libre
             ->first();
 
         if ($mesaLibre != null) {
@@ -33,20 +33,21 @@ class MesaController implements IApiControler
 
     public function ObtenerMesaLibre()
     {
-        $mesaLibre = Mesa::where("idEstadoMesa", "=", "4") //4 Mesa Libre
+        $mesaLibre = Mesa::where("idEstadoMesa", "=", "4") //4 = libre
             ->select("codigoMesa")
             ->first();
 
         if ($mesaLibre != null) {
-            self::CambiarEstado($mesaLibre->codigoMesa, 1); //1 Ocupada
-            $newResponse = $mesaLibre->codigoMesa;
+            self::CambiarEstado($mesaLibre->codigoMesa, 1); //1 = ocupada
+            return $mesaLibre->codigoMesa;
         }
         return null;
     }
 
     public function CambiarEstado($codigMesa, $estado)
     {
-        $mesa = Mesa::where('codigoMesa', $codigMesa)->first();
+        $mesa = Mesa::where('codigoMesa', $codigMesa)
+            ->first();
         if ($mesa) {
             $mesa->idEstadoMesa = $estado;
             $mesa->save();
@@ -70,7 +71,7 @@ class MesaController implements IApiControler
     {
         $mesa = new Mesa;
         $mesa->codigoMesa = " ";
-        $mesa->idEstadoMesa = 4;
+        $mesa->idEstadoMesa = 4; //4 = libre
         $mesa->save();
         if ($mesa->id >= 10) {
             $mesa->codigoMesa = "MSA" . $mesa->id;

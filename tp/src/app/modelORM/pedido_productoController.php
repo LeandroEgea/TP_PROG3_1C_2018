@@ -31,26 +31,23 @@ class PedidoProductoController
         return $data;
     }
 
-    public function CambiarEstado($codigo, $encargadoID, $estadoInicial, $estadoactual)
+    public function CambiarEstado($codigoPedido, $idRolEncargado, $estadoInicial, $estadoActual)
     {
-        $ret = false;
-        $data = PedidoProducto::where('idEstadoProducto', '=', $estadoInicial)
-            ->where('codigoPedido', '=', $codigo)
+        $huboCambios = false;
+        $pedidosProductos = PedidoProducto::join('pedidos', 'pedidos_productos.idPedido', 'pedidos.id')
+            ->where('idEstadoProducto', '=', $estadoInicial)
+            ->where('pedidos.codigoPedido', '=', $codigoPedido)
             ->get();
 
-        foreach ($data as $value) {
-            $prod = Producto::where('id', '=', $value->idProducto)->first();
-
-            if ($encargadoID == 3) {
-                $value->idEstadoProducto = $estadoactual;
-                $value->save();
-                $ret = true;
-            } else if ($prod->idRol == $encargadoID) {
-                $value->idEstadoProducto = $estadoactual;
-                $value->save();
-                $ret = true;
+        foreach ($pedidosProductos as $pedidoProducto) {
+            $producto = Producto::where('id', '=', $pedidoProducto->idProducto)
+                ->first();
+            if ($idRolEncargado == 3 || $producto->idRol == $idRolEncargado) { // 3 = socio
+                $pedidoProducto->idEstadoProducto = $estadoActual;
+                $pedidoProducto->save();
+                $huboCambios = true;
             }
         }
-        return $ret;
+        return $huboCambios;
     }
 }
