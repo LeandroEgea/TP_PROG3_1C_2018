@@ -3,7 +3,6 @@
 namespace App\Models\ORM;
 
 use App\Models\ORM\PedidoProducto;
-use App\Models\ORM\Producto;
 
 include_once __DIR__ . '/pedido_producto.php';
 include_once __DIR__ . '/producto.php';
@@ -35,19 +34,20 @@ class PedidoProductoController
     {
         $huboCambios = false;
         $pedidosProductos = PedidoProducto::join('pedidos', 'pedidos_productos.idPedido', 'pedidos.id')
-            ->where('idEstadoProducto', '=', $estadoInicial)
+            ->where('pedidos_productos.idEstadoProducto', '=', $estadoInicial)
             ->where('pedidos.codigoPedido', '=', $codigoPedido)
+            ->select('pedidos_productos.id', 'pedidos_productos.idProducto')
             ->get();
 
         foreach ($pedidosProductos as $pedidoProducto) {
-            $producto = Producto::where('id', '=', $pedidoProducto->idProducto)
-                ->first();
+            $producto = Producto::find($pedidoProducto->idProducto);
             if ($idRolEncargado == 3 || $producto->idRol == $idRolEncargado) { // 3 = socio
-                $pedidoProducto->idEstadoProducto = $estadoActual;
-                $pedidoProducto->save();
+                $pedProdDB = PedidoProducto::find($pedidoProducto->id);
+                $pedProdDB->idEstadoProducto = $estadoActual;
+                $pedProdDB->save();
                 $huboCambios = true;
             }
         }
-        return $huboCambios;
+        return true;
     }
 }

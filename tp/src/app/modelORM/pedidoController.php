@@ -99,7 +99,7 @@ class PedidoController implements IApiControler
     {
         $codigo = $args['codigo'];
         $pedido = Pedido::where('codigoPedido', $codigo)
-            ->get();
+            ->first();
         if ($pedido != null) {
             $pedido->delete();
             return $response->withJson($pedido, 200);
@@ -107,7 +107,70 @@ class PedidoController implements IApiControler
         return $response->withJson('El pedido no existe', 400);
     }
 
-    //TODO: Modificar
+    public function ModificarUno($request, $response, $args)
+    {
+        //TODO: Hacer entero
+        $arrayDeParametros = $request->getParsedBody();
+        $id = null;
+        $pedido = null;
+        $contadorModificaciones = 0;
+        $archivos = [];
+        if (array_key_exists("id", $arrayDeParametros)) {
+            $id = $arrayDeParametros['id'];
+            $pedido = Pedido::find($id);
+            $archivos = $request->getUploadedFiles();
+        }
+        if (array_key_exists("codigoMesa", $arrayDeParametros) && $id != null && $pedido != null) {
+            $pedido->codigoMesa = $arrayDeParametros["codigoMesa"];
+            $contadorModificaciones++;
+        }
+        if (array_key_exists("productos", $arrayDeParametros) && $id != null && $pedido != null) {
+            $pedido->Productos = $arrayDeParametros["productos"];
+            $contadorModificaciones++;
+
+            PedidoProducto::where("idPedido", "=", $id)->delete();
+            $productos = explode(",", $arrayDeParametros["productos"]);
+            for ($i = 0; $i < count($productos); $i++) {
+                $pedidoProducto = new PedidoProducto;
+                $pedidoProducto->codigoPedido = $pedido->codigo;
+                $pedidoProducto->idProducto = $productos[$i];
+                $pedidoProducto->idEstadoProducto = 1;
+                $pedidoProducto->save();
+            }
+        }
+
+        if (array_key_exists("idEncargado", $arrayDeParametros) && $id != null && $pedido != null) {
+            $pedido->idEncargado = $arrayDeParametros["idEncargado"];
+            $contadorModificaciones++;
+        }
+
+        if (array_key_exists("nombreCliente", $arrayDeParametros) && $id != null && $pedido != null) {
+            $pedido->nombreCliente = $arrayDeParametros["nombreCliente"];
+            $contadorModificaciones++;
+        }
+
+        if (array_key_exists("imagen", $archivos) && $id != null && $pedido != null && $archivos != null) {
+            $pedido->imagen = $archivos["imagen"]->file;
+            $contadorModificaciones++;
+        }
+
+        if (array_key_exists("tiempo", $arrayDeParametros) && $id != null && $pedido != null) {
+            $pedido->tiempo = $arrayDeParametros["tiempo"];
+            $contadorModificaciones++;
+        }
+        if ($contadorModificaciones > 0 && $contadorModificaciones <= 4 && $id != null && $pedido != null) {
+            $pedido->idEstadoPedido = 1;
+            $pedido->save();
+            $newResponse = $response->withJson('Pedido ' . $id . ' modificado', 200);
+        } else if ($id == null) {
+            $newResponse = $response->withJson('No se introducido un id valido', 200);
+        } else if ($id != null && $pedido == null) {
+            $newResponse = $response->withJson("No hay un pedido con ese ID", 200);
+        } else {
+            $newResponse = $response->withJson("No se ha modificado ningun campo ", 200);
+        }
+        return $newResponse;
+    }
 
     public function GenerarCodigoPedido()
     {
@@ -131,6 +194,7 @@ class PedidoController implements IApiControler
 
     public function PrepararPedido($request, $response, $args)
     {
+        //TODO: GUARD
         $tokenData = $request->getAttribute('tokenData');
         $codigoPedido = $args['codigo'];
         // 1 = pendiente, 2 = en preparacion
@@ -138,7 +202,7 @@ class PedidoController implements IApiControler
 
         if ($respuesta === true) {
             PedidoController::CambiarEstado($codigoPedido, 2); // 2 = en preparacion
-            return $response->withJson("Comienza preparacion del pedido: " . $codigoPedido, 200);
+            return $response->withJson("Pedido en preparacion: " . $codigoPedido, 200);
         } else {
             return $response->withJson("No habia pedidos o ya fueron tomados para preparar", 400);
         }
@@ -180,7 +244,8 @@ class PedidoController implements IApiControler
     {
         //TODO: GUARD
         $codigoPedido = $args['codigo'];
-        $pedido = Pedido::where('codigoPedido', $codigoPedido)->first();
+        $pedido = Pedido::where('codigoPedido', $codigoPedido)
+            ->first();
         //TODO: Validar que sea distinto de null
         if ($pedido->idEstadoPedido == 3) { // 3 = listo para servir
             $pedido = pedido::where('codigoPedido', '=', $codigoPedido)
@@ -188,9 +253,10 @@ class PedidoController implements IApiControler
             MesaController::CambiarEstado($pedido->codigoMesa, 2); // 2 = comiendo
             PedidoController::CambiarEstado($codigoPedido, 4); // 4 = servido
             PedidoProductoController::CambiarEstado($codigoPedido, 3, 3, 4); // 4 = servido
-            return $response->withJson("Pedido servido", 200);
+            return $response->withJson("Pedido servido: " . $codigoPedido, 200);
         } else {
-            return $response->withJson("El pedido no esta listo para ser servido", 400);
+            return $response->withJson(
+                "El pedido no esta listo para ser servido: " . $codigoPedido, 400);
         }
     }
 
@@ -228,6 +294,7 @@ class PedidoController implements IApiControler
 
     public function Cobrar($request, $response, $args)
     {
+        //TODO: GUARD
         $codigoPedido = $args['codigo'];
         //TODO: Validar que sea distinto de null
         $pedido = Pedido::where('codigoPedido', '=', $codigoPedido)
@@ -243,7 +310,7 @@ class PedidoController implements IApiControler
             PedidoController::CambiarEstado($codigoPedido, 5); // 5 = cobrado
             MesaController::CambiarEstado($pedido->codigoMesa, 4); // 4 = libre
             return $response->withJson(
-                "Pedido: " . $codigoPedido . " cobrado, Mesa: " . $mesa->id . " libre", 200);
+                "Pedido: " . $codigoPedido . " cobrado, Mesa: " . $mesa->codigoMesa . " libre", 200);
         } else {
             return $response->withJson("La mesa no habia solicitado la cuenta", 400);
         }
