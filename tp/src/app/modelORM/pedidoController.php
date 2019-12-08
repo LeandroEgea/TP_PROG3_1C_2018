@@ -14,8 +14,6 @@ include_once __DIR__ . '/mesaController.php';
 include_once __DIR__ . '/pedido_producto.php';
 include_once __DIR__ . '../../modelAPI/IApiControler.php';
 
-use \stdClass;
-
 class PedidoController implements IApiControler
 {
     public function TraerTodos($request, $response, $args)
@@ -99,7 +97,7 @@ class PedidoController implements IApiControler
 
     public function BorrarUno($request, $response, $args)
     {
-        $codigo = $args["codigo"];
+        $codigo = $args['codigo'];
         $pedido = Pedido::where('codigoPedido', $codigo)
             ->get();
         if ($pedido != null) {
@@ -134,13 +132,13 @@ class PedidoController implements IApiControler
     public function PrepararPedido($request, $response, $args)
     {
         $tokenData = $request->getAttribute('tokenData');
-        $body = $request->getParsedBody();
+        $codigoPedido = $args['codigo'];
         // 1 = pendiente, 2 = en preparacion
-        $respuesta = PedidoProductoController::CambiarEstado($body["codigoPedido"], $tokenData->idRol, 1, 2);
+        $respuesta = PedidoProductoController::CambiarEstado($codigoPedido, $tokenData->idRol, 1, 2);
 
         if ($respuesta === true) {
-            PedidoController::CambiarEstado($body["codigoPedido"], 2); // 2 = en preparacion
-            return $response->withJson("Comienza preparacion del pedido: " . $body["codigoPedido"], 200);
+            PedidoController::CambiarEstado($codigoPedido, 2); // 2 = en preparacion
+            return $response->withJson("Comienza preparacion del pedido: " . $codigoPedido, 200);
         } else {
             return $response->withJson("No habia pedidos o ya fueron tomados para preparar", 400);
         }
@@ -148,17 +146,15 @@ class PedidoController implements IApiControler
 
     public function TerminarPedido($request, $response, $args)
     {
+        //TODO: GUARD
         $tokenData = $request->getAttribute('tokenData');
-        $body = $request->getParsedBody();
+        $codigoPedido = $args['codigo'];
         // 2 = en preparacion, 3 = listo para servir
-        $respuesta = PedidoProductoController::CambiarEstado($body["codigoPedido"], $tokenData->idRol, 2, 3);
+        $respuesta = PedidoProductoController::CambiarEstado($codigoPedido, $tokenData->idRol, 2, 3);
 
         if ($respuesta === true) {
-            $data = PedidoProducto::where('codigoPedido', $body["codigoPedido"])
-                ->get();
-
-            $pedidosProductos = PedidoProducto::join('pedidos', 'pedidos_productos.idPedido', 'pedidos.id')
-                ->where('pedidos.codigoPedido', '=', $body["codigoPedido"])
+            $data = PedidoProducto::join('pedidos', 'pedidos_productos.idPedido', 'pedidos.id')
+                ->where('pedidos.codigoPedido', '=', $codigoPedido)
                 ->get();
 
             $completo = true;
@@ -168,11 +164,12 @@ class PedidoController implements IApiControler
                 }
             }
             if ($completo === true) {
-                PedidoController::CambiarEstado($body["codigoPedido"], 3);
-                PedidoProductoController::CambiarEstado($body["codigoPedido"], $tokenData->idRol, 2, 3);
-                return $response->withJson("Se preparon todos los productos. Pedido listo para servir", 200);
+                PedidoController::CambiarEstado($codigoPedido, 3); // 3 = listo para servir
+                return $response->withJson(
+                    "Se finalizó la preparacion de los productos, pedido " . $codigoPedido . " listo para servir", 200);
             } else {
-                return $response->withJson("Se finalizó la preparacion de los productos", 200);
+                return $response->withJson(
+                    "Se finalizó la preparacion de los productos del rol: " . $tokenData->cargo . " para el pedido: " . $codigoPedido, 200);
             }
         } else {
             return $response->withJson("No hay productos pendientes para este pedido", 400);
@@ -181,71 +178,74 @@ class PedidoController implements IApiControler
 
     public function ServirPedido($request, $response, $args)
     {
-        $body = $request->getParsedBody();
-        $pedido = Pedido::where('codigoPedido', $body["codigoPedido"])->first();
-        if ($pedido->idEstadoPedido == 3) {
-            $pedido = pedido::where('codigoPedido', '=', $body["codigoPedido"])->first();
-            MesaController::CambiarEstado($pedido->codigoMesa, 2);
-
-            PedidoController::CambiarEstado($body["codigoPedido"], 4);
-
-            PedidoProductoController::CambiarEstado($body["codigoPedido"], 3, 3, 4);
-
-            $newResponse = $response->withJson("Pedido entregado", 200);
+        //TODO: GUARD
+        $codigoPedido = $args['codigo'];
+        $pedido = Pedido::where('codigoPedido', $codigoPedido)->first();
+        //TODO: Validar que sea distinto de null
+        if ($pedido->idEstadoPedido == 3) { // 3 = listo para servir
+            $pedido = pedido::where('codigoPedido', '=', $codigoPedido)
+                ->first();
+            MesaController::CambiarEstado($pedido->codigoMesa, 2); // 2 = comiendo
+            PedidoController::CambiarEstado($codigoPedido, 4); // 4 = servido
+            PedidoProductoController::CambiarEstado($codigoPedido, 3, 3, 4); // 4 = servido
+            return $response->withJson("Pedido servido", 200);
         } else {
-            $newResponse = $response->withJson("El pedido no esta listo para ser entregado", 200);
+            return $response->withJson("El pedido no esta listo para ser servido", 400);
         }
-        return $newResponse;
     }
+
     public function PedirCuenta($request, $response, $args)
     {
         $total = 0;
-        $body = $request->getParams();
-        $pedido = Pedido::where('codigoPedido', '=', $body['codigoPedido'])->first();
+        //TODO: cambiar ticket a mostrar
+        //$ticketMostrado = new \stdClass;
+
+        $codigoPedido = $args['codigo'];
+        $pedido = Pedido::where('codigoPedido', '=', $codigoPedido)
+            ->first();
+        //TODO: Validar que sea distinto de null
+        //TODO: Validar el estado del pedido
         $productos = PedidoProducto::join('productos', 'productos.id', 'productos_pedidos.idProducto')
-            ->where('codigoPedido', '=', $body['codigoPedido'])->get();
-        $ticket = [];
+            ->where('codigoPedido', '=', $codigoPedido)->get();
+        //TODO: Validar que sea distinto de null
+        //TODO: Validar el estado de los productos
         foreach ($productos as $producto) {
-            $prod = new \stdClass;
-            $prod->producto = $producto->descripcion;
-            $prod->precio = $producto->precio;
+            // $prod = new \stdClass;
+            // $prod->producto = $producto->descripcion;
+            // $prod->precio = $producto->precio;
             $total = $total + $producto->precio;
-            array_push($ticket, $prod);
+            // array_push($ticket, $prod);
         }
-        $cuenta = new \stdClass;
-        $cuenta->nombreCliente = $pedido->nombreCliente;
-        $cuenta->ticket = $pedido->codigoPedido;
-        $cuenta->pedido = $ticket;
-        $cuenta->total = $this->total;
-        $nuevoRetorno = $response->withJson($cuenta, 200);
-        MesaController::CambiarEstado($pedido->codigoMesa, 3);
-        return $nuevoRetorno;
+
+        $ticket = new Ticket;
+        $ticket->idPedido = $pedido->id;
+        $ticket->precioTotal = $total;
+        $ticket->pagado = 0;
+        $ticket->save();
+        MesaController::CambiarEstado($pedido->codigoMesa, 3); // 3 = pagando
+        return $response->withJson($ticket, 200);
     }
 
     public function Cobrar($request, $response, $args)
     {
-        $total = 0;
-        $body = $request->getParams();
-        $pedido = Pedido::where('codigoPedido', '=', $body['codigoPedido'])->first();
-        if ($pedido != null && $pedido->idEstadoPedido == 4) {
-            $ticket = new Ticket();
-            $ticket->codigoPedido = $pedido->codigoPedido;
-            $productos = PedidoProducto::join('productos', 'productos.id', 'productos_pedidos.idProducto')
-                ->where('codigoPedido', '=', $body['codigoPedido'])->get();
-            foreach ($productos as $producto) {
-                $total = $total + $producto->precio;
-            }
-            $ticket->precioTotal = $total;
-            $ticket->mesa = $pedido->codigoMesa;
-            $encargado = Encargado::where('id', '=', $pedido->idEncargado)->first();
-            $ticket->encargado = $encargado->usuario;
+        $codigoPedido = $args['codigo'];
+        //TODO: Validar que sea distinto de null
+        $pedido = Pedido::where('codigoPedido', '=', $codigoPedido)
+            ->first();
+        $ticket = Ticket::where('idPedido', '=', $pedido->id)
+            ->first();
+        $mesa = Mesa::where('codigoMesa', '=', $pedido->codigoMesa)
+            ->first();
+
+        if ($mesa != null && $mesa->idEstadoMesa == 3) { // 3 = pagando
+            $ticket->pagado = 1;
             $ticket->save();
-            PedidoController::CambiarEstado($body['codigoPedido'], 5); //cobrado
-            MesaController::CambiarEstado($pedido->codigoMesa, 4); //cerrada
-            $newResponse = $response->withJson("Pedido cobrado - Mesa Cerrada", 200);
+            PedidoController::CambiarEstado($codigoPedido, 5); // 5 = cobrado
+            MesaController::CambiarEstado($pedido->codigoMesa, 4); // 4 = libre
+            return $response->withJson(
+                "Pedido: " . $codigoPedido . " cobrado, Mesa: " . $mesa->id . " libre", 200);
         } else {
-            $newResponse = $response->withJson("Pedido no encontrado", 200);
+            return $response->withJson("La mesa no habia solicitado la cuenta", 400);
         }
-        return $newResponse;
     }
 }

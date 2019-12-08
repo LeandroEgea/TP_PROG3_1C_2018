@@ -158,7 +158,7 @@ class Middleware
                 if ($data->cargo === "mozo" || $data->cargo === "socio") {
                     $newResponse = $next($request, $response);
                 } else {
-                    $newResponse = $response->withJson("Solo se admiten mozos para esta operacion", 401);
+                    $newResponse = $response->withJson("Solo se admiten mozos o socios para esta operacion", 401);
                 }
             } catch (Exception $e) {
                 $newResponse = $response->withJson("Fallo en la funcion", 500);

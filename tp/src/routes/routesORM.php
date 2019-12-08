@@ -46,6 +46,7 @@ return function (App $app) {
             ->add(Middleware::class . ":ValidarToken");
     });
 
+    //En EsMozo, los socios tambien pueden realizar esas acciones
     $app->group('/pedidos', function () {
         //ABM
         $this->get('[/]', PedidoController::class . ':TraerTodos');
@@ -53,20 +54,20 @@ return function (App $app) {
         $this->post('[/]', PedidoController::class . ':CargarUno')
             ->add(Middleware::class . ":ValidarToken")
             ->add(Middleware::class . ":EsMozo");
-        $this->put('/{codigo}[/]', PedidoController::class . ':ModificarUno');
+        $this->post('/put/{codigo}[/]', PedidoController::class . ':ModificarUno');
         $this->delete('/{codigo}[/]', PedidoController::class . ':BorrarUno');
         //Negocio
-        $this->post('/preparar[/]', PedidoController::class . ':PrepararPedido')
+        $this->put('/preparar/{codigo}[/]', PedidoController::class . ':PrepararPedido')
             ->add(Middleware::class . ":ValidarToken");
-        $this->post('/terminar[/]', PedidoController::class . ':TerminarPedido')
+        $this->put('/terminar/{codigo}[/]', PedidoController::class . ':TerminarPedido')
             ->add(Middleware::class . ":ValidarToken");
-        $this->post('/servir[/]', PedidoController::class . ':ServirPedido')
+        $this->put('/servir/{codigo}[/]', PedidoController::class . ':ServirPedido')
             ->add(Middleware::class . ":ValidarToken")
             ->add(Middleware::class . ":EsMozo");
-        $this->get('/cuenta[/]', PedidoController::class . ':PedirCuenta')
+        $this->put('/cuenta/{codigo}[/]', PedidoController::class . ':PedirCuenta')
             ->add(Middleware::class . ":ValidarToken")
             ->add(Middleware::class . ":EsMozo");
-        $this->get('/cobrar[/]', PedidoController::class . ':Cobrar')
+        $this->put('/cobrar/{codigo}[/]', PedidoController::class . ':Cobrar')
             ->add(Middleware::class . ":ValidarToken")
             ->add(Middleware::class . ":EsMozo");
     });
