@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 02-12-2019 a las 12:29:05
+-- Tiempo de generación: 08-12-2019 a las 19:00:46
 -- Versión del servidor: 10.4.6-MariaDB
 -- Versión de PHP: 7.3.8
 
@@ -30,11 +30,11 @@ SET time_zone = "+00:00";
 
 CREATE TABLE `encargados` (
   `id` int(11) NOT NULL,
-  `nombre` varchar(60) COLLATE utf8_spanish2_ci NOT NULL,
-  `apellido` varchar(60) COLLATE utf8_spanish2_ci NOT NULL,
-  `usuario` varchar(10) COLLATE utf8_spanish2_ci NOT NULL,
-  `idRol` int(2) NOT NULL,
-  `clave` varchar(60) COLLATE utf8_spanish2_ci NOT NULL,
+  `nombre` varchar(64) COLLATE utf8_spanish2_ci NOT NULL,
+  `apellido` varchar(64) COLLATE utf8_spanish2_ci NOT NULL,
+  `usuario` varchar(64) COLLATE utf8_spanish2_ci NOT NULL,
+  `idRol` int(11) NOT NULL,
+  `clave` varchar(64) COLLATE utf8_spanish2_ci NOT NULL,
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish2_ci;
@@ -44,30 +44,31 @@ CREATE TABLE `encargados` (
 --
 
 INSERT INTO `encargados` (`id`, `nombre`, `apellido`, `usuario`, `idRol`, `clave`, `updated_at`, `created_at`) VALUES
-(1, 'Leandro', 'Egea', 'leandroe', 3, 'pass', '2019-11-13 18:41:26', '2019-11-09 19:16:41');
+(1, 'Leandro', 'Egea', 'leandroe', 3, 'pass', '2019-11-13 18:41:26', '2019-11-09 19:16:41'),
+(17, 'Roberto', 'Gomez', 'robertog', 5, 'pass', '2019-12-02 16:39:54', '2019-12-02 16:23:35');
 
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `estados_mesa`
+-- Estructura de tabla para la tabla `estados_mesas`
 --
 
-CREATE TABLE `estados_mesa` (
+CREATE TABLE `estados_mesas` (
   `id` int(11) NOT NULL,
-  `descripcion` varchar(40) COLLATE utf8_spanish2_ci NOT NULL,
-  `updated_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+  `descripcion` varchar(64) COLLATE utf8_spanish2_ci NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish2_ci;
 
 --
--- Volcado de datos para la tabla `estados_mesa`
+-- Volcado de datos para la tabla `estados_mesas`
 --
 
-INSERT INTO `estados_mesa` (`id`, `descripcion`, `updated_at`, `created_at`) VALUES
-(1, 'con cliente esperando', '2019-11-09 19:20:31', '2019-11-09 19:20:31'),
-(2, 'con clientes comiendo', '2019-11-09 19:22:03', '2019-11-09 19:22:03'),
-(3, 'con clientes pagando', '2019-11-09 19:23:13', '2019-11-09 19:23:13'),
-(4, 'cerrada', '2019-11-09 19:23:23', '2019-11-09 19:23:23');
+INSERT INTO `estados_mesas` (`id`, `descripcion`, `created_at`, `updated_at`) VALUES
+(1, 'esperando', '2019-12-08 16:41:27', '2019-12-08 16:41:27'),
+(2, 'comiendo', '2019-12-08 16:41:27', '2019-12-08 16:41:27'),
+(3, 'pagando', '2019-12-08 16:41:27', '2019-12-08 16:41:27'),
+(4, 'cerrada', '2019-12-08 16:41:27', '2019-12-08 16:41:27');
 
 -- --------------------------------------------------------
 
@@ -77,7 +78,7 @@ INSERT INTO `estados_mesa` (`id`, `descripcion`, `updated_at`, `created_at`) VAL
 
 CREATE TABLE `estados_pedidos` (
   `id` int(11) NOT NULL,
-  `descripcion` varchar(20) COLLATE utf8_spanish2_ci NOT NULL,
+  `descripcion` varchar(64) COLLATE utf8_spanish2_ci NOT NULL,
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish2_ci;
@@ -98,7 +99,7 @@ INSERT INTO `estados_pedidos` (`id`, `descripcion`, `updated_at`, `created_at`) 
 
 CREATE TABLE `estados_productos` (
   `id` int(11) NOT NULL,
-  `descripcion` varchar(20) COLLATE utf8_spanish2_ci NOT NULL,
+  `descripcion` varchar(64) COLLATE utf8_spanish2_ci NOT NULL,
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish2_ci;
@@ -120,8 +121,8 @@ INSERT INTO `estados_productos` (`id`, `descripcion`, `updated_at`, `created_at`
 
 CREATE TABLE `mesas` (
   `id` int(11) NOT NULL,
-  `codigoMesa` varchar(60) COLLATE utf8_spanish2_ci NOT NULL,
-  `idEstadoMesa` int(2) NOT NULL,
+  `codigoMesa` varchar(64) COLLATE utf8_spanish2_ci NOT NULL,
+  `idEstadoMesa` int(11) NOT NULL,
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish2_ci;
@@ -146,14 +147,13 @@ INSERT INTO `mesas` (`id`, `codigoMesa`, `idEstadoMesa`, `updated_at`, `created_
 
 CREATE TABLE `pedidos` (
   `id` int(11) NOT NULL,
-  `idEstadoPedido` int(2) NOT NULL,
-  `codigoPedido` varchar(10) COLLATE utf8_spanish2_ci NOT NULL,
-  `codigoMesa` varchar(20) COLLATE utf8_spanish2_ci NOT NULL,
-  `idEncargado` int(2) NOT NULL,
-  `productos` varchar(100) COLLATE utf8_spanish2_ci NOT NULL,
-  `nombreCliente` varchar(40) COLLATE utf8_spanish2_ci NOT NULL,
-  `imagen` varchar(200) COLLATE utf8_spanish2_ci NOT NULL,
-  `tiempo` int(4) NOT NULL,
+  `idEstadoPedido` int(11) NOT NULL,
+  `codigoPedido` varchar(64) COLLATE utf8_spanish2_ci NOT NULL,
+  `codigoMesa` varchar(64) COLLATE utf8_spanish2_ci NOT NULL,
+  `idEncargado` int(11) NOT NULL,
+  `nombreCliente` varchar(64) COLLATE utf8_spanish2_ci NOT NULL,
+  `imagen` varchar(1024) COLLATE utf8_spanish2_ci NOT NULL,
+  `tiempo` int(11) NOT NULL,
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish2_ci;
@@ -167,21 +167,10 @@ CREATE TABLE `pedidos` (
 CREATE TABLE `pedidos_productos` (
   `idPedido` int(11) NOT NULL,
   `idProducto` int(11) NOT NULL,
-  `idEstadoProducto` int(2) NOT NULL,
+  `idEstadoProducto` int(11) NOT NULL,
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish2_ci;
-
---
--- Volcado de datos para la tabla `pedidos_productos`
---
-
-INSERT INTO `pedidos_productos` (`idPedido`, `idProducto`, `idEstadoProducto`, `updated_at`, `created_at`) VALUES
-(1, 1, 1, '2019-11-16 00:03:45', '2019-11-16 00:03:45'),
-(1, 1, 1, '2019-11-16 00:03:45', '2019-11-16 00:03:45'),
-(1, 8, 1, '2019-11-16 00:03:45', '2019-11-16 00:03:45'),
-(1, 10, 1, '2019-11-16 00:03:45', '2019-11-16 00:03:45'),
-(1, 9, 1, '2019-11-16 00:03:45', '2019-11-16 00:03:45');
 
 -- --------------------------------------------------------
 
@@ -191,9 +180,8 @@ INSERT INTO `pedidos_productos` (`idPedido`, `idProducto`, `idEstadoProducto`, `
 
 CREATE TABLE `productos` (
   `id` int(11) NOT NULL,
-  `descripcion` varchar(60) COLLATE utf8_spanish2_ci NOT NULL,
-  `tipo` varchar(20) COLLATE utf8_spanish2_ci NOT NULL,
-  `precio` int(10) NOT NULL,
+  `descripcion` varchar(64) COLLATE utf8_spanish2_ci NOT NULL,
+  `precio` int(11) NOT NULL,
   `idRol` int(11) NOT NULL,
   `tiempoPreparacion` int(11) NOT NULL,
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
@@ -204,21 +192,22 @@ CREATE TABLE `productos` (
 -- Volcado de datos para la tabla `productos`
 --
 
-INSERT INTO `productos` (`id`, `descripcion`, `tipo`, `precio`, `idRol`, `tiempoPreparacion`, `updated_at`, `created_at`) VALUES
-(1, 'Coca-Cola', 'bebida', 80, 5, 3, '2019-12-02 11:20:56', '2019-12-02 11:20:56'),
-(2, 'Fanta', 'bebida', 90, 5, 3, '2019-12-02 11:21:12', '2019-12-02 11:21:12'),
-(3, 'Paso de los Toros', 'bebida', 75, 5, 3, '2019-12-02 11:21:38', '2019-12-02 11:21:38'),
-(4, 'Cafe', 'bebida', 90, 5, 5, '2019-12-02 11:21:51', '2019-12-02 11:21:51'),
-(5, 'Agua Sin Gas', 'bebida', 60, 5, 3, '2019-12-02 11:22:59', '2019-12-02 11:22:59'),
-(6, 'Agua Con Gas', 'bebida', 70, 5, 3, '2019-12-02 11:23:19', '2019-12-02 11:23:19'),
-(7, 'Milanesa con Fritas', 'comida', 300, 1, 15, '2019-12-02 11:23:45', '2019-12-02 11:23:45'),
-(8, 'Tallarines', 'comida', 250, 1, 16, '2019-12-02 11:27:56', '2019-12-02 11:27:56'),
-(10, 'Pollo', 'comida', 240, 1, 15, '2019-12-02 11:25:32', '2019-12-02 11:25:32'),
-(11, 'Vino tinto', 'vino', 300, 4, 6, '2019-11-12 19:43:05', '2019-11-12 15:43:05'),
-(12, 'Racion de Papas Fritas', 'comida', 150, 1, 15, '2019-12-02 11:28:07', '2019-12-02 11:28:07'),
-(14, 'Cuba Libre', 'trago', 200, 4, 3, '2019-12-02 11:26:31', '2019-12-02 11:26:31'),
-(15, 'Cerveza', 'cerveza', 150, 2, 6, '2019-11-12 19:43:51', '2019-11-12 15:43:51'),
-(18, 'Asado para Dos\r\n', 'comida', 500, 1, 12, '2019-12-02 11:27:12', '2019-12-02 11:27:12');
+INSERT INTO `productos` (`id`, `descripcion`, `precio`, `idRol`, `tiempoPreparacion`, `updated_at`, `created_at`) VALUES
+(1, 'Coca-Cola', 80, 5, 3, '2019-12-02 11:20:56', '2019-12-02 11:20:56'),
+(2, 'Fanta', 90, 5, 3, '2019-12-02 11:21:12', '2019-12-02 11:21:12'),
+(3, 'Paso de los Toros', 75, 5, 3, '2019-12-02 11:21:38', '2019-12-02 11:21:38'),
+(4, 'Cafe', 90, 5, 5, '2019-12-02 11:21:51', '2019-12-02 11:21:51'),
+(5, 'Agua Sin Gas', 60, 5, 3, '2019-12-02 11:22:59', '2019-12-02 11:22:59'),
+(6, 'Agua Con Gas', 70, 5, 3, '2019-12-02 11:23:19', '2019-12-02 11:23:19'),
+(7, 'Milanesa con Fritas', 300, 1, 15, '2019-12-02 11:23:45', '2019-12-02 11:23:45'),
+(8, 'Tallarines', 250, 1, 16, '2019-12-02 11:27:56', '2019-12-02 11:27:56'),
+(10, 'Pollo', 240, 1, 15, '2019-12-02 11:25:32', '2019-12-02 11:25:32'),
+(11, 'Vino tinto', 300, 4, 6, '2019-11-12 19:43:05', '2019-11-12 15:43:05'),
+(12, 'Racion de Papas Fritas', 150, 1, 15, '2019-12-02 11:28:07', '2019-12-02 11:28:07'),
+(14, 'Cuba Libre', 200, 4, 3, '2019-12-02 11:26:31', '2019-12-02 11:26:31'),
+(15, 'Cerveza', 150, 2, 6, '2019-11-12 19:43:51', '2019-11-12 15:43:51'),
+(18, 'Asado para Dos\r\n', 500, 1, 12, '2019-12-02 11:27:12', '2019-12-02 11:27:12'),
+(20, 'Mirinda', 99, 5, 2, '2019-12-05 06:53:35', '2019-12-05 06:53:35');
 
 -- --------------------------------------------------------
 
@@ -228,7 +217,7 @@ INSERT INTO `productos` (`id`, `descripcion`, `tipo`, `precio`, `idRol`, `tiempo
 
 CREATE TABLE `roles` (
   `id` int(11) NOT NULL,
-  `cargo` varchar(20) COLLATE utf8_spanish2_ci NOT NULL,
+  `cargo` varchar(64) COLLATE utf8_spanish2_ci NOT NULL,
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish2_ci;
@@ -252,7 +241,10 @@ INSERT INTO `roles` (`id`, `cargo`, `updated_at`, `created_at`) VALUES
 
 CREATE TABLE `tickets` (
   `id` int(11) NOT NULL,
-  `precioTotal` int(10) NOT NULL
+  `idPedido` int(11) NOT NULL,
+  `precioTotal` int(11) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish2_ci;
 
 --
@@ -263,55 +255,77 @@ CREATE TABLE `tickets` (
 -- Indices de la tabla `encargados`
 --
 ALTER TABLE `encargados`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `usuario` (`usuario`),
+  ADD KEY `idRol` (`idRol`);
 
 --
--- Indices de la tabla `estados_mesa`
+-- Indices de la tabla `estados_mesas`
 --
-ALTER TABLE `estados_mesa`
-  ADD PRIMARY KEY (`id`);
+ALTER TABLE `estados_mesas`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `descripcion` (`descripcion`);
 
 --
 -- Indices de la tabla `estados_pedidos`
 --
 ALTER TABLE `estados_pedidos`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `descripcion` (`descripcion`);
 
 --
 -- Indices de la tabla `estados_productos`
 --
 ALTER TABLE `estados_productos`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `descripcion` (`descripcion`);
 
 --
 -- Indices de la tabla `mesas`
 --
 ALTER TABLE `mesas`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `codigoMesa` (`codigoMesa`),
+  ADD KEY `idEstadoMesa` (`idEstadoMesa`);
 
 --
 -- Indices de la tabla `pedidos`
 --
 ALTER TABLE `pedidos`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `codigoPedido` (`codigoPedido`),
+  ADD KEY `idEstadoPedido` (`idEstadoPedido`),
+  ADD KEY `codigoMesa` (`codigoMesa`),
+  ADD KEY `idEncargado` (`idEncargado`);
+
+--
+-- Indices de la tabla `pedidos_productos`
+--
+ALTER TABLE `pedidos_productos`
+  ADD KEY `idPedido` (`idPedido`),
+  ADD KEY `idProducto` (`idProducto`),
+  ADD KEY `idEstadoProducto` (`idEstadoProducto`);
 
 --
 -- Indices de la tabla `productos`
 --
 ALTER TABLE `productos`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `idRol` (`idRol`);
 
 --
 -- Indices de la tabla `roles`
 --
 ALTER TABLE `roles`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `cargo` (`cargo`);
 
 --
 -- Indices de la tabla `tickets`
 --
 ALTER TABLE `tickets`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `idPedido` (`idPedido`);
 
 --
 -- AUTO_INCREMENT de las tablas volcadas
@@ -321,12 +335,12 @@ ALTER TABLE `tickets`
 -- AUTO_INCREMENT de la tabla `encargados`
 --
 ALTER TABLE `encargados`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
--- AUTO_INCREMENT de la tabla `estados_mesa`
+-- AUTO_INCREMENT de la tabla `estados_mesas`
 --
-ALTER TABLE `estados_mesa`
+ALTER TABLE `estados_mesas`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
@@ -357,7 +371,7 @@ ALTER TABLE `pedidos`
 -- AUTO_INCREMENT de la tabla `productos`
 --
 ALTER TABLE `productos`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
 
 --
 -- AUTO_INCREMENT de la tabla `roles`
@@ -370,6 +384,50 @@ ALTER TABLE `roles`
 --
 ALTER TABLE `tickets`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- Restricciones para tablas volcadas
+--
+
+--
+-- Filtros para la tabla `encargados`
+--
+ALTER TABLE `encargados`
+  ADD CONSTRAINT `encargados_ibfk_1` FOREIGN KEY (`idRol`) REFERENCES `roles` (`id`) ON UPDATE CASCADE;
+
+--
+-- Filtros para la tabla `mesas`
+--
+ALTER TABLE `mesas`
+  ADD CONSTRAINT `mesas_ibfk_1` FOREIGN KEY (`idEstadoMesa`) REFERENCES `estados_mesas` (`id`) ON UPDATE CASCADE;
+
+--
+-- Filtros para la tabla `pedidos`
+--
+ALTER TABLE `pedidos`
+  ADD CONSTRAINT `pedidos_ibfk_1` FOREIGN KEY (`idEstadoPedido`) REFERENCES `estados_pedidos` (`id`) ON UPDATE CASCADE,
+  ADD CONSTRAINT `pedidos_ibfk_2` FOREIGN KEY (`codigoMesa`) REFERENCES `mesas` (`codigoMesa`) ON UPDATE CASCADE,
+  ADD CONSTRAINT `pedidos_ibfk_3` FOREIGN KEY (`idEncargado`) REFERENCES `encargados` (`id`) ON UPDATE CASCADE;
+
+--
+-- Filtros para la tabla `pedidos_productos`
+--
+ALTER TABLE `pedidos_productos`
+  ADD CONSTRAINT `pedidos_productos_ibfk_1` FOREIGN KEY (`idPedido`) REFERENCES `pedidos` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `pedidos_productos_ibfk_2` FOREIGN KEY (`idProducto`) REFERENCES `productos` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `pedidos_productos_ibfk_3` FOREIGN KEY (`idEstadoProducto`) REFERENCES `estados_productos` (`id`) ON UPDATE CASCADE;
+
+--
+-- Filtros para la tabla `productos`
+--
+ALTER TABLE `productos`
+  ADD CONSTRAINT `productos_ibfk_1` FOREIGN KEY (`idRol`) REFERENCES `roles` (`id`) ON UPDATE CASCADE;
+
+--
+-- Filtros para la tabla `tickets`
+--
+ALTER TABLE `tickets`
+  ADD CONSTRAINT `tickets_ibfk_1` FOREIGN KEY (`idPedido`) REFERENCES `pedidos` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
