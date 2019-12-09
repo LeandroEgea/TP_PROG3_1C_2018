@@ -97,11 +97,11 @@ class PedidoController implements IApiControler
 
     public function CargarImagen($imagen, $codigoPedido)
     {
-        // $extension = $imagen->getClientFilename();
-        // $extension = explode(".", $extension);
-        // $direccion = "./images/users/" . $codigoPedido . $extension[1];
-        // $imagen->moveTo($direccion);
-        return "ey";
+        $extension = $imagen->getClientFilename();
+        $extension = explode(".", $extension);
+        $direccion = "./images/clients/" . $codigoPedido . "." . $extension[1];
+        $imagen->moveTo($direccion);
+        return $direccion;
     }
 
     public function BorrarUno($request, $response, $args)
