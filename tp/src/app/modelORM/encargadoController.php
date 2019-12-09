@@ -53,11 +53,17 @@ class EncargadoController implements IApiControler
     {
         $id = $args["id"];
         $encargado = Encargado::find($id);
-        if ($encargado != null) {
-            $encargado->delete();
-            return $response->withJson($encargado, 200);
+        if ($encargado == null) {
+            return $response->withJson('El encargado no existe', 400);
         }
-        return $response->withJson('El encargado no existe', 200);
+        $pedidos = Pedido::where('idEncargado', $id)
+            ->first();
+        if ($pedidos != null) {
+            return $response->withJson('No se pueden borrar encargados que hayan sido utilizadas en un pedido', 400);
+        }
+
+        $encargado->delete();
+        return $response->withJson($encargado, 200);
     }
 
     public function ModificarUno($request, $response, $args)

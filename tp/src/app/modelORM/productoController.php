@@ -49,11 +49,17 @@ class ProductoController implements IApiControler
     {
         $id = $args["id"];
         $producto = Producto::find($id);
-        if ($producto != null) {
-            $producto->delete();
-            return $response->withJson($producto, 200);
+        if ($producto == null) {
+            return $response->withJson('El producto no existe', 400);
         }
-        return $response->withJson('El producto no existe', 400);
+        $pedidos = PedidoProducto::where('idProducto', $id)
+            ->first();
+        if ($pedidos != null) {
+            return $response->withJson('No se pueden borrar productos que hayan sido utilizadas en un pedido', 400);
+        }
+
+        $producto->delete();
+        return $response->withJson($producto, 200);
     }
 
     public function ModificarUno($request, $response, $args)
