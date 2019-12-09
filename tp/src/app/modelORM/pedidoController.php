@@ -269,20 +269,25 @@ class PedidoController implements IApiControler
         $codigoPedido = $args['codigo'];
         $pedido = Pedido::where('codigoPedido', '=', $codigoPedido)
             ->first();
+
         //TODO: Validar que sea distinto de null
         //TODO: Validar el estado del pedido
-        $productos = PedidoProducto::join('productos', 'productos.id', 'productos_pedidos.idProducto')
-            ->where('codigoPedido', '=', $codigoPedido)->get();
+        $productos = PedidoProducto::join('productos', 'productos.id', 'pedidos_productos.idProducto')
+            ->where('pedidos_productos.idPedido', '=', $pedido->id)
+            ->select('productos.precio')
+            ->get();
+
         //TODO: Validar que sea distinto de null
         //TODO: Validar el estado de los productos
         foreach ($productos as $producto) {
-            // $prod = new \stdClass;
-            // $prod->producto = $producto->descripcion;
-            // $prod->precio = $producto->precio;
-            $total = $total + $producto->precio;
-            // array_push($ticket, $prod);
+          // $prod = new \stdClass;
+          // $prod->producto = $producto->descripcion;
+          // $prod->precio = $producto->precio;
+          $total = $total + $producto->precio;
+          // array_push($ticket, $prod);
         }
-
+        
+        //TODO: Validar que no haya ticket
         $ticket = new Ticket;
         $ticket->idPedido = $pedido->id;
         $ticket->precioTotal = $total;
