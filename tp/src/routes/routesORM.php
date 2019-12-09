@@ -17,31 +17,44 @@ return function (App $app) {
     $app->group('/mesas', function () {
         $this->get('[/]', MesaController::class . ':TraerTodos');
         $this->get('/get/{id}[/]', MesaController::class . ':TraerUno');
-        $this->post('[/]', MesaController::class . ':CargarUno');
-        $this->put('/{id}[/]', MesaController::class . ':ModificarUno');
-        $this->delete('/{id}[/]', MesaController::class . ':BorrarUno');
+        $this->post('[/]', MesaController::class . ':CargarUno')
+            ->add(Middleware::class . ":ValidarToken")
+            ->add(Middleware::class . ":EsSocio");
+        $this->put('/{id}[/]', MesaController::class . ':ModificarUno')
+            ->add(Middleware::class . ":ValidarToken")
+            ->add(Middleware::class . ":EsSocio");
+        $this->delete('/{id}[/]', MesaController::class . ':BorrarUno')
+            ->add(Middleware::class . ":ValidarToken")
+            ->add(Middleware::class . ":EsSocio");
         $this->get('/libre[/]', MesaController::class . ':ObtenerMesaLibreResponse');
     });
 
     $app->group('/encargados', function () {
-        $this->get('[/]', EncargadoController::class . ':TraerTodos');
-        $this->get('/get/{id}[/]', EncargadoController::class . ':TraerUno');
+        $this->get('[/]', EncargadoController::class . ':TraerTodos')
+            ->add(Middleware::class . ":ValidarToken");
+        $this->get('/get/{id}[/]', EncargadoController::class . ':TraerUno')
+            ->add(Middleware::class . ":ValidarToken");
         $this->post('[/]', EncargadoController::class . ':CargarUno')
             ->add(Middleware::class . ":ValidarToken")
             ->add(Middleware::class . ":EsSocio");
         $this->post('/put/{id}[/]', EncargadoController::class . ':ModificarUno')
-            ->add(Middleware::class . ":ValidarToken");
+            ->add(Middleware::class . ":ValidarToken")
+            ->add(Middleware::class . ":EsSocio");
         $this->delete('/{id}[/]', EncargadoController::class . ':BorrarUno')
-            ->add(Middleware::class . ":ValidarToken");
+            ->add(Middleware::class . ":ValidarToken")
+            ->add(Middleware::class . ":EsSocio");
         $this->post('/login[/]', EncargadoController::class . ':IniciarSesion');
     });
 
     $app->group('/productos', function () {
         $this->get('[/]', ProductoController::class . ':TraerTodos');
         $this->get('/get/{id}[/]', ProductoController::class . ':TraerUno');
-        $this->post('[/]', ProductoController::class . ':CargarUno');
-        $this->post('/put/{id}[/]', ProductoController::class . ':ModificarUno');
-        $this->delete('/{id}[/]', ProductoController::class . ':BorrarUno');
+        $this->post('[/]', ProductoController::class . ':CargarUno')
+            ->add(Middleware::class . ":ValidarToken");
+        $this->post('/put/{id}[/]', ProductoController::class . ':ModificarUno')
+            ->add(Middleware::class . ":ValidarToken");
+        $this->delete('/{id}[/]', ProductoController::class . ':BorrarUno')
+            ->add(Middleware::class . ":ValidarToken");
         $this->get('/pendientes[/]', ProductoController::class . ':VerPendientes')
             ->add(Middleware::class . ":ValidarToken");
     });
@@ -54,8 +67,12 @@ return function (App $app) {
         $this->post('[/]', PedidoController::class . ':CargarUno')
             ->add(Middleware::class . ":ValidarToken")
             ->add(Middleware::class . ":EsMozo");
-        $this->post('/put/{codigo}[/]', PedidoController::class . ':ModificarUno');
-        $this->delete('/{codigo}[/]', PedidoController::class . ':BorrarUno');
+        $this->post('/put/{codigo}[/]', PedidoController::class . ':ModificarUno')
+            ->add(Middleware::class . ":ValidarToken")
+            ->add(Middleware::class . ":EsMozo");
+        $this->delete('/{codigo}[/]', PedidoController::class . ':BorrarUno')
+            ->add(Middleware::class . ":ValidarToken")
+            ->add(Middleware::class . ":EsMozo");
         //Negocio
         $this->put('/preparar/{codigo}[/]', PedidoController::class . ':PrepararPedido')
             ->add(Middleware::class . ":ValidarToken");
