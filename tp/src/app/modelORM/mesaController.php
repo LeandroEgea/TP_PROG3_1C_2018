@@ -4,8 +4,10 @@ namespace App\Models\ORM;
 
 use App\Models\IApiControler;
 use App\Models\ORM\Mesa;
+use App\Models\ORM\Pedido;
 
 include_once __DIR__ . '/mesa.php';
+include_once __DIR__ . '/pedido.php';
 include_once __DIR__ . '../../modelAPI/AutentificadorJWT.php';
 include_once __DIR__ . '../../modelAPI/IApiControler.php';
 
@@ -59,12 +61,14 @@ class MesaController implements IApiControler
 
     public function TraerUno($request, $response, $args)
     {
-        $id = $args["id"];
-        $mesa = Mesa::find($id);
+        $codigo = $args['codigo'];
+        $mesa = Mesa::where('codigoMesa', $codigo)
+            ->first();
+
         if ($mesa != null) {
             return $response->withJson($mesa, 200);
         }
-        return $response->withJson("ID invalido", 400);
+        return $response->withJson("codigo invalido", 400);
     }
 
     public function CargarUno($request, $response, $args)
@@ -84,11 +88,23 @@ class MesaController implements IApiControler
 
     public function BorrarUno($request, $response, $args)
     {
-        return $response->withJson('No se pueden borrar mesas', 400);
+        $codigo = $args['codigo'];
+        $mesa = Mesa::where('codigoMesa', $codigo)
+            ->first();
+        if ($mesa == null) {
+            return $response->withJson('codigo invalido', 400);
+        }
+
+        $pedidos = Pedido::where('codigoMesa', $codigo)
+            ->get();
+        if ($pedidos != null) {
+            return $response->withJson('No se pueden borrar mesas que hayan sido utilizadas en un pedido', 400);
+        }
+        return $response->withJson($mesa->$codigMesa, 200);
     }
 
     public function ModificarUno($request, $response, $args)
     {
-        return $response->withJson('No se pueden modificar mesas', 400);
+        return $response->withJson('No hay datos a modificar en las mesas', 400);
     }
 }

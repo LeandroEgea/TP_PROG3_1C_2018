@@ -16,14 +16,14 @@ return function (App $app) {
 
     $app->group('/mesas', function () {
         $this->get('[/]', MesaController::class . ':TraerTodos');
-        $this->get('/get/{id}[/]', MesaController::class . ':TraerUno');
+        $this->get('/get/{codigo}[/]', MesaController::class . ':TraerUno');
         $this->post('[/]', MesaController::class . ':CargarUno')
             ->add(Middleware::class . ":ValidarToken")
             ->add(Middleware::class . ":EsSocio");
-        $this->put('/{id}[/]', MesaController::class . ':ModificarUno')
+        $this->put('/{codigo}[/]', MesaController::class . ':ModificarUno')
             ->add(Middleware::class . ":ValidarToken")
             ->add(Middleware::class . ":EsSocio");
-        $this->delete('/{id}[/]', MesaController::class . ':BorrarUno')
+        $this->delete('/{codigo}[/]', MesaController::class . ':BorrarUno')
             ->add(Middleware::class . ":ValidarToken")
             ->add(Middleware::class . ":EsSocio");
         $this->get('/libre[/]', MesaController::class . ':ObtenerMesaLibreResponse');
