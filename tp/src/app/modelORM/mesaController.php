@@ -96,11 +96,12 @@ class MesaController implements IApiControler
         }
 
         $pedidos = Pedido::where('codigoMesa', $codigo)
-            ->get();
+            ->first();
         if ($pedidos != null) {
             return $response->withJson('No se pueden borrar mesas que hayan sido utilizadas en un pedido', 400);
         }
-        return $response->withJson($mesa->$codigMesa, 200);
+        $mesa->delete();
+        return $response->withJson($codigo, 200);
     }
 
     public function ModificarUno($request, $response, $args)
