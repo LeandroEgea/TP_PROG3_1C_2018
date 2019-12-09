@@ -118,67 +118,56 @@ class PedidoController implements IApiControler
 
     public function ModificarUno($request, $response, $args)
     {
-        //TODO: Hacer entero
-        $arrayDeParametros = $request->getParsedBody();
-        $id = null;
-        $pedido = null;
-        $contadorModificaciones = 0;
-        $archivos = [];
-        if (array_key_exists("id", $arrayDeParametros)) {
-            $id = $arrayDeParametros['id'];
-            $pedido = Pedido::find($id);
-            $archivos = $request->getUploadedFiles();
+        $body = $request->getParsedBody();
+        $archivos = $request->getUploadedFiles();
+        $codigo = $args['codigo'];
+        if ($codigo == null) {
+            return $response->withJson('Introduzca codigo', 400);
         }
-        if (array_key_exists("codigoMesa", $arrayDeParametros) && $id != null && $pedido != null) {
-            $pedido->codigoMesa = $arrayDeParametros["codigoMesa"];
-            $contadorModificaciones++;
+        $pedido = Pedido::where('codigoPedido', $codigo)
+            ->first();
+        if ($pedido == null) {
+            return $response->withJson("No se encontro pedido", 400);
         }
-        if (array_key_exists("productos", $arrayDeParametros) && $id != null && $pedido != null) {
-            $pedido->Productos = $arrayDeParametros["productos"];
-            $contadorModificaciones++;
 
-            PedidoProducto::where("idPedido", "=", $id)->delete();
-            $productos = explode(",", $arrayDeParametros["productos"]);
-            for ($i = 0; $i < count($productos); $i++) {
-                $pedidoProducto = new PedidoProducto;
-                $pedidoProducto->codigoPedido = $pedido->codigo;
-                $pedidoProducto->idProducto = $productos[$i];
-                $pedidoProducto->idEstadoProducto = 1;
-                $pedidoProducto->save();
+        $modificado = false;
+        if (array_key_exists("nombreCliente", $body)) {
+            $pedido->nombreCliente = $body["nombreCliente"];
+            $modificado = true;
+        }
+        if (array_key_exists("tiempo", $body)) {
+            $pedido->tiempo = $body["tiempo"];
+            $modificado = true;
+        }
+        if ($archivos != null && array_key_exists("imagen", $archivos)) {
+            $pedido->imagen = PedidoController::CargarImagen($archivos["imagen"], $pedido->codigoPedido);
+            $modificado = true;
+        }
+        if (array_key_exists("productos", $body)) {
+            $productos = explode(",", $body["productos"]);
+            foreach ($productos as $idProducto) {
+                $producto = Producto::find($idProducto);
+                if ($producto != null) {
+                    $pedidoProducto = new PedidoProducto;
+                    $pedidoProducto->idPedido = $pedido->id;
+                    $pedidoProducto->idProducto = $producto->id;
+                    $pedidoProducto->idEstadoProducto = 1; // 1 = pendiente
+                    $pedidoProducto->save();
+                    if ($producto->tiempoPreparacion > $pedido->tiempo) {
+                        $pedido->tiempo = $producto->tiempoPreparacion;
+                    }
+                    $pedido->idEstadoPedido = 1; // 1 = pendiente
+                    $modificado = true;
+                }
             }
         }
 
-        if (array_key_exists("idEncargado", $arrayDeParametros) && $id != null && $pedido != null) {
-            $pedido->idEncargado = $arrayDeParametros["idEncargado"];
-            $contadorModificaciones++;
-        }
-
-        if (array_key_exists("nombreCliente", $arrayDeParametros) && $id != null && $pedido != null) {
-            $pedido->nombreCliente = $arrayDeParametros["nombreCliente"];
-            $contadorModificaciones++;
-        }
-
-        if (array_key_exists("imagen", $archivos) && $id != null && $pedido != null && $archivos != null) {
-            $pedido->imagen = $archivos["imagen"]->file;
-            $contadorModificaciones++;
-        }
-
-        if (array_key_exists("tiempo", $arrayDeParametros) && $id != null && $pedido != null) {
-            $pedido->tiempo = $arrayDeParametros["tiempo"];
-            $contadorModificaciones++;
-        }
-        if ($contadorModificaciones > 0 && $contadorModificaciones <= 4 && $id != null && $pedido != null) {
-            $pedido->idEstadoPedido = 1;
+        if ($modificado === true) {
             $pedido->save();
-            $newResponse = $response->withJson('Pedido ' . $id . ' modificado', 200);
-        } else if ($id == null) {
-            $newResponse = $response->withJson('No se introducido un id valido', 200);
-        } else if ($id != null && $pedido == null) {
-            $newResponse = $response->withJson("No hay un pedido con ese ID", 200);
-        } else {
-            $newResponse = $response->withJson("No se ha modificado ningun campo ", 200);
+            return $response->withJson($pedido, 200);
         }
-        return $newResponse;
+        return $response->withJson("No se ha modificado ningun campo", 400);
+
     }
 
     public function GenerarCodigoPedido()
