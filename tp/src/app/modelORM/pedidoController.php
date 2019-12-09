@@ -59,7 +59,7 @@ class PedidoController implements IApiControler
             $nuevoPedido->nombreCliente = $body["nombreCliente"];
             $archivos = $request->getUploadedFiles();
             if ($archivos != null && $archivos["imagen"] != null) {
-                $nuevoPedido->imagen = $archivos["imagen"]->file;
+                $nuevoPedido->imagen = PedidoController::CargarImagen($archivos["imagen"], $nuevoPedido->codigoPedido);
             }
             $nuevoPedido->tiempo = 0;
             $nuevoPedido->save();
@@ -93,6 +93,15 @@ class PedidoController implements IApiControler
         } else {
             return $response->withJson('No hay mesas disponibles', 400);
         }
+    }
+
+    public function CargarImagen($imagen, $codigoPedido)
+    {
+        // $extension = $imagen->getClientFilename();
+        // $extension = explode(".", $extension);
+        // $direccion = "./images/users/" . $codigoPedido . $extension[1];
+        // $imagen->moveTo($direccion);
+        return "ey";
     }
 
     public function BorrarUno($request, $response, $args)
@@ -263,38 +272,45 @@ class PedidoController implements IApiControler
     public function PedirCuenta($request, $response, $args)
     {
         $total = 0;
-        //TODO: cambiar ticket a mostrar
-        //$ticketMostrado = new \stdClass;
+        $ticketMostrado = new \stdClass;
+        $productosTicketMostrado = [];
 
         $codigoPedido = $args['codigo'];
         $pedido = Pedido::where('codigoPedido', '=', $codigoPedido)
             ->first();
 
+        //TODO: Validar que no haya ticket
         //TODO: Validar que sea distinto de null
         //TODO: Validar el estado del pedido
         $productos = PedidoProducto::join('productos', 'productos.id', 'pedidos_productos.idProducto')
             ->where('pedidos_productos.idPedido', '=', $pedido->id)
-            ->select('productos.precio')
+            ->select('productos.precio', 'productos.descripcion')
             ->get();
 
         //TODO: Validar que sea distinto de null
         //TODO: Validar el estado de los productos
         foreach ($productos as $producto) {
-          // $prod = new \stdClass;
-          // $prod->producto = $producto->descripcion;
-          // $prod->precio = $producto->precio;
-          $total = $total + $producto->precio;
-          // array_push($ticket, $prod);
+            $total = $total + $producto->precio;
+
+            $prod = new \stdClass;
+            $prod->producto = $producto->descripcion;
+            $prod->precio = $producto->precio;
+            array_push($productosTicketMostrado, $prod);
         }
-        
-        //TODO: Validar que no haya ticket
+
         $ticket = new Ticket;
         $ticket->idPedido = $pedido->id;
         $ticket->precioTotal = $total;
         $ticket->pagado = 0;
         $ticket->save();
         MesaController::CambiarEstado($pedido->codigoMesa, 3); // 3 = pagando
-        return $response->withJson($ticket, 200);
+
+        $ticketMostrado->total = $total;
+        $ticketMostrado->codigoPedido = $pedido->codigoPedido;
+        $ticketMostrado->codigoMesa = $pedido->codigoMesa;
+        $ticketMostrado->nombreCliente = $pedido->nombreCliente;
+        $ticketMostrado->productos = $productosTicketMostrado;
+        return $response->withJson($ticketMostrado, 200);
     }
 
     public function Cobrar($request, $response, $args)
