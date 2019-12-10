@@ -33,7 +33,14 @@ class ProductoController implements IApiControler
 
     public function CargarUno($request, $response, $args)
     {
-        //TODO: Guard
+        $body = $request->getParsedBody();
+        if (!array_key_exists("descripcion", $body) ||
+            !array_key_exists("precio", $body) ||
+            !array_key_exists("idRol", $body) ||
+            !array_key_exists("tiempoPreparacion", $body)) {
+            return $response->withJson('Introduzca todos los datos', 400);
+        }
+
         $body = $request->getParsedBody();
         $productoNuevo = new Producto;
         $productoNuevo->descripcion = $body["descripcion"];
