@@ -28,8 +28,10 @@ class EncargadoController implements IApiControler
     public function TraerUno($request, $response, $args)
     {
         $id = $args["id"];
-        $encargado = Encargado::find($id);
+        $encargado = Encargado::find($id)
+            ->toArray();
         if ($encargado != null) {
+            unset($encargado["clave"], $encargado["created_at"], $encargado["updated_at"]);
             return $response->withJson($encargado, 200);
         }
         return $response->withJson("ID invalido", 400);

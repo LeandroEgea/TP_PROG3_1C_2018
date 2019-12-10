@@ -133,23 +133,27 @@ class Middleware
     public function EsSocio($request, $response, $next)
     {
         $token = $request->getHeader('token');
+        $data;
         if ($token != null) {
             try {
                 $token = $request->getHeader('token')[0];
                 $data = AutentificadorJWT::ObtenerData($token);
+            } catch (Exception $e) {
+                return $response->withJson("Token invalido", 500);
+            }
 
+            try {
                 if ($data->cargo === "socio") {
-                    $newResponse = $next($request, $response);
+                    return $next($request, $response);
                 } else {
-                    $newResponse = $response->withJson("Solo se admiten socios para esta operacion", 401);
+                    return $response->withJson("Solo se admiten socios para esta operacion", 401);
                 }
             } catch (Exception $e) {
-                $newResponse = $response->withJson("Fallo en la funcion", 500);
+                return $response->withJson("Fallo en la funcion", 500);
             }
         } else {
-            $newResponse = $response->withJson("No se ha recibido un token. Verificar e intentar nuevamente", 500);
+            return $response->withJson("No se ha recibido un token. Verificar e intentar nuevamente", 500);
         }
-        return $newResponse;
     }
 
     public function EsMozo($request, $response, $next)
