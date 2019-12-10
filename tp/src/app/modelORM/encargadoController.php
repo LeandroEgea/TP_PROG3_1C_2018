@@ -119,7 +119,10 @@ class EncargadoController implements IApiControler
         }
         if ($modificado === true) {
             $encargado->save();
-            return $response->withJson($encargado, 200);
+            $encargadoMostrar = Encargado::find($encargado->id)
+                ->toArray();
+            unset($encargadoMostrar["clave"], $encargadoMostrar["created_at"], $encargadoMostrar["updated_at"]);
+            return $response->withJson($encargadoMostrar, 200);
         }
         return $response->withJson("No se ha modificado ningun campo", 400);
     }
