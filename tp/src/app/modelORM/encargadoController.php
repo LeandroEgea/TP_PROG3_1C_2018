@@ -39,8 +39,21 @@ class EncargadoController implements IApiControler
 
     public function CargarUno($request, $response, $args)
     {
-        //TODO: Guard
         $body = $request->getParsedBody();
+        if (!array_key_exists("nombre", $body) ||
+            !array_key_exists("apellido", $body) ||
+            !array_key_exists("usuario", $body) ||
+            !array_key_exists("clave", $body) ||
+            !array_key_exists("idRol", $body)) {
+            return $response->withJson('Introduzca todos los datos', 400);
+        }
+
+        $usuario = Encargado::where('usuario', $body["usuario"])
+            ->first();
+        if ($usuario != null) {
+            return $response->withJson("Ya existe encargado con ese usuario", 200);
+        }
+
         $encargadoNuevo = new Encargado;
         $encargadoNuevo->nombre = $body["nombre"];
         $encargadoNuevo->apellido = $body["apellido"];
@@ -48,7 +61,10 @@ class EncargadoController implements IApiControler
         $encargadoNuevo->clave = $body["clave"];
         $encargadoNuevo->idRol = $body["idRol"];
         $encargadoNuevo->save();
-        return $response->withJson($encargadoNuevo, 200);
+        $encargado = Encargado::find($encargadoNuevo->id)
+            ->toArray();
+        unset($encargado["clave"], $encargado["created_at"], $encargado["updated_at"]);
+        return $response->withJson($encargado, 200);
     }
 
     public function BorrarUno($request, $response, $args)
