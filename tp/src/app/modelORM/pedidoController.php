@@ -35,7 +35,7 @@ class PedidoController implements IApiControler
                 ->get();
 
             if ($pedido != null && count($pedido) == 1) {
-                return $response->withJson($retorno, 200);
+                return $response->withJson($pedido, 200);
             } else {
                 return $response->withJson("No hay pedidos cargados con ese codigo", 400);
             }
