@@ -109,21 +109,25 @@ class Middleware
     public function ValidarToken($request, $response, $next)
     {
         $token = $request->getHeader('token');
+        $req;
         if ($token != null) {
             try {
                 $token = $request->getHeader('token')[0];
                 if (AutentificadorJWT::VerificarToken($token)) {
                     $data = AutentificadorJWT::ObtenerData($token);
-                    $request = $request->withAttribute('tokenData', $data);
-                    $newResponse = $next($request, $response);
+                    $req = $request->withAttribute('tokenData', $data);
                 }
             } catch (Exception $e) {
-                $newResponse = $response->withJson("Fallo en la funcion (estoy en ValidarToken)", 500);
+                return $response->withJson("Token Invalido", 500);
+            }
+            try {
+                return $next($req, $response);
+            } catch (Exception $e) {
+                return $response->withJson("Fallo en la funcion (estoy en ValidarToken)", 500);
             }
         } else {
-            $newResponse = $response->withJson("No se ha recibido un token. Verificar e intentar nuevamente", 500);
+            return $response->withJson("No se ha recibido un token. Verificar e intentar nuevamente", 500);
         }
-        return $newResponse;
     }
 
     public function EsSocio($request, $response, $next)
