@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 08-12-2019 a las 19:00:46
+-- Tiempo de generación: 10-12-2019 a las 04:19:42
 -- Versión del servidor: 10.4.6-MariaDB
 -- Versión de PHP: 7.3.8
 
@@ -45,7 +45,10 @@ CREATE TABLE `encargados` (
 
 INSERT INTO `encargados` (`id`, `nombre`, `apellido`, `usuario`, `idRol`, `clave`, `updated_at`, `created_at`) VALUES
 (1, 'Leandro', 'Egea', 'leandroe', 3, 'pass', '2019-11-13 18:41:26', '2019-11-09 19:16:41'),
-(17, 'Roberto', 'Gomez', 'robertog', 5, 'pass', '2019-12-02 16:39:54', '2019-12-02 16:23:35');
+(35, 'Cocinero', 'Gomez', 'cocinerog', 1, 'pass', '2019-12-10 06:44:00', '2019-12-10 06:42:40'),
+(36, 'Cervecero', 'Gomez', 'cervecerog', 2, 'pass', '2019-12-10 06:46:11', '2019-12-10 06:42:55'),
+(37, 'Bartender', 'Gomez', 'bartenderg', 4, 'pass', '2019-12-10 06:46:18', '2019-12-10 06:43:12'),
+(38, 'Mozo', 'Gomez', 'mozog', 5, 'pass', '2019-12-10 06:43:28', '2019-12-10 06:43:28');
 
 -- --------------------------------------------------------
 
@@ -65,10 +68,10 @@ CREATE TABLE `estados_mesas` (
 --
 
 INSERT INTO `estados_mesas` (`id`, `descripcion`, `created_at`, `updated_at`) VALUES
-(1, 'esperando', '2019-12-08 16:41:27', '2019-12-08 16:41:27'),
+(1, 'ocupada', '2019-12-08 16:41:27', '2019-12-08 16:41:27'),
 (2, 'comiendo', '2019-12-08 16:41:27', '2019-12-08 16:41:27'),
 (3, 'pagando', '2019-12-08 16:41:27', '2019-12-08 16:41:27'),
-(4, 'cerrada', '2019-12-08 16:41:27', '2019-12-08 16:41:27');
+(4, 'libre', '2019-12-08 16:41:27', '2019-12-08 16:41:27');
 
 -- --------------------------------------------------------
 
@@ -88,8 +91,11 @@ CREATE TABLE `estados_pedidos` (
 --
 
 INSERT INTO `estados_pedidos` (`id`, `descripcion`, `updated_at`, `created_at`) VALUES
-(1, 'en preparacion', '2019-11-09 19:29:48', '2019-11-09 19:29:48'),
-(2, 'listo para servir', '2019-11-09 19:30:16', '2019-11-09 19:30:16');
+(1, 'pendiente', '2019-11-09 19:29:48', '2019-11-09 19:29:48'),
+(2, 'en preparacion', '2019-11-09 19:30:16', '2019-11-09 19:30:16'),
+(3, 'listo para servir', '2019-12-08 18:34:54', '2019-12-08 18:34:54'),
+(4, 'servido', '2019-12-08 20:29:34', '2019-12-08 20:29:34'),
+(5, 'cobrado', '2019-12-08 21:28:33', '2019-12-08 21:28:33');
 
 -- --------------------------------------------------------
 
@@ -111,7 +117,8 @@ CREATE TABLE `estados_productos` (
 INSERT INTO `estados_productos` (`id`, `descripcion`, `updated_at`, `created_at`) VALUES
 (1, 'pendiente', '2019-11-09 19:24:39', '2019-11-09 19:24:39'),
 (2, 'en preparacion', '2019-11-09 19:24:55', '2019-11-09 19:24:55'),
-(3, 'listo para servir', '2019-11-09 19:25:23', '2019-11-09 19:25:23');
+(3, 'listo para servir', '2019-11-09 19:25:23', '2019-11-09 19:25:23'),
+(4, 'servido', '2019-12-08 20:31:23', '2019-12-08 20:31:23');
 
 -- --------------------------------------------------------
 
@@ -132,12 +139,11 @@ CREATE TABLE `mesas` (
 --
 
 INSERT INTO `mesas` (`id`, `codigoMesa`, `idEstadoMesa`, `updated_at`, `created_at`) VALUES
-(1, 'MSA01', 2, '2019-11-16 00:03:45', '2019-11-16 00:01:34'),
-(2, 'MSA02', 1, '2019-11-16 00:03:45', '2019-11-16 00:01:34'),
-(3, 'MSA03', 1, '2019-11-16 00:03:45', '2019-11-16 00:01:34'),
-(4, 'MSA04', 1, '2019-11-16 00:03:45', '2019-11-16 00:01:34'),
-(5, 'MSA05', 1, '2019-12-02 09:36:50', '2019-12-02 09:23:54'),
-(6, 'MSA06', 4, '2019-12-02 09:45:37', '2019-12-02 09:45:37');
+(1, 'MSA01', 4, '2019-12-10 07:11:48', '2019-11-16 00:01:34'),
+(2, 'MSA02', 4, '2019-12-09 07:05:35', '2019-11-16 00:01:34'),
+(3, 'MSA03', 4, '2019-12-09 07:00:05', '2019-11-16 00:01:34'),
+(5, 'MSA05', 4, '2019-12-09 07:14:59', '2019-12-02 09:23:54'),
+(7, 'MSA07', 4, '2019-12-10 06:50:10', '2019-12-10 06:50:10');
 
 -- --------------------------------------------------------
 
@@ -158,6 +164,15 @@ CREATE TABLE `pedidos` (
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish2_ci;
 
+--
+-- Volcado de datos para la tabla `pedidos`
+--
+
+INSERT INTO `pedidos` (`id`, `idEstadoPedido`, `codigoPedido`, `codigoMesa`, `idEncargado`, `nombreCliente`, `imagen`, `tiempo`, `updated_at`, `created_at`) VALUES
+(3, 5, '8RjdK', 'MSA05', 1, 'Rodolfo', 'C:\\xampp\\tmp\\php9121.tmp', 0, '2019-12-09 04:01:55', '2019-12-09 02:54:58'),
+(4, 5, 'RXgSI', 'MSA05', 1, 'Rodolfo', 'C:\\xampp\\tmp\\php31E8.tmp', 0, '2019-12-09 06:14:08', '2019-12-09 05:51:30'),
+(10, 5, '60S4z', 'MSA01', 38, 'Rodolfo', './images/clients/60S4z.jpg', 0, '2019-12-10 07:11:48', '2019-12-10 07:02:15');
+
 -- --------------------------------------------------------
 
 --
@@ -165,12 +180,34 @@ CREATE TABLE `pedidos` (
 --
 
 CREATE TABLE `pedidos_productos` (
+  `id` int(11) NOT NULL,
   `idPedido` int(11) NOT NULL,
   `idProducto` int(11) NOT NULL,
   `idEstadoProducto` int(11) NOT NULL,
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish2_ci;
+
+--
+-- Volcado de datos para la tabla `pedidos_productos`
+--
+
+INSERT INTO `pedidos_productos` (`id`, `idPedido`, `idProducto`, `idEstadoProducto`, `updated_at`, `created_at`) VALUES
+(1, 3, 3, 4, '2019-12-09 03:29:04', '2019-12-09 02:54:58'),
+(2, 3, 5, 4, '2019-12-09 03:29:04', '2019-12-09 02:54:58'),
+(3, 3, 5, 4, '2019-12-09 03:29:04', '2019-12-09 02:54:58'),
+(4, 3, 6, 4, '2019-12-09 03:29:04', '2019-12-09 02:54:58'),
+(5, 4, 3, 4, '2019-12-09 05:53:46', '2019-12-09 05:51:30'),
+(6, 4, 5, 4, '2019-12-09 05:53:46', '2019-12-09 05:51:30'),
+(7, 4, 5, 4, '2019-12-09 05:53:46', '2019-12-09 05:51:30'),
+(8, 4, 8, 4, '2019-12-09 05:53:46', '2019-12-09 05:51:30'),
+(29, 10, 1, 4, '2019-12-10 07:10:02', '2019-12-10 07:02:15'),
+(30, 10, 7, 4, '2019-12-10 07:10:03', '2019-12-10 07:02:15'),
+(31, 10, 7, 4, '2019-12-10 07:10:03', '2019-12-10 07:02:15'),
+(32, 10, 8, 4, '2019-12-10 07:10:03', '2019-12-10 07:02:15'),
+(33, 10, 14, 4, '2019-12-10 07:10:03', '2019-12-10 07:02:15'),
+(34, 10, 15, 4, '2019-12-10 07:10:03', '2019-12-10 07:02:15'),
+(35, 10, 7, 4, '2019-12-10 07:10:03', '2019-12-10 07:03:23');
 
 -- --------------------------------------------------------
 
@@ -243,9 +280,19 @@ CREATE TABLE `tickets` (
   `id` int(11) NOT NULL,
   `idPedido` int(11) NOT NULL,
   `precioTotal` int(11) NOT NULL,
+  `pagado` tinyint(4) NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish2_ci;
+
+--
+-- Volcado de datos para la tabla `tickets`
+--
+
+INSERT INTO `tickets` (`id`, `idPedido`, `precioTotal`, `pagado`, `created_at`, `updated_at`) VALUES
+(1, 3, 265, 1, '2019-12-09 03:53:34', '2019-12-09 04:01:55'),
+(4, 4, 445, 1, '2019-12-09 06:04:32', '2019-12-09 06:14:08'),
+(7, 10, 1580, 1, '2019-12-10 07:10:55', '2019-12-10 07:11:48');
 
 --
 -- Índices para tablas volcadas
@@ -302,6 +349,7 @@ ALTER TABLE `pedidos`
 -- Indices de la tabla `pedidos_productos`
 --
 ALTER TABLE `pedidos_productos`
+  ADD PRIMARY KEY (`id`),
   ADD KEY `idPedido` (`idPedido`),
   ADD KEY `idProducto` (`idProducto`),
   ADD KEY `idEstadoProducto` (`idEstadoProducto`);
@@ -335,7 +383,7 @@ ALTER TABLE `tickets`
 -- AUTO_INCREMENT de la tabla `encargados`
 --
 ALTER TABLE `encargados`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=39;
 
 --
 -- AUTO_INCREMENT de la tabla `estados_mesas`
@@ -347,31 +395,37 @@ ALTER TABLE `estados_mesas`
 -- AUTO_INCREMENT de la tabla `estados_pedidos`
 --
 ALTER TABLE `estados_pedidos`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT de la tabla `estados_productos`
 --
 ALTER TABLE `estados_productos`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT de la tabla `mesas`
 --
 ALTER TABLE `mesas`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT de la tabla `pedidos`
 --
 ALTER TABLE `pedidos`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+
+--
+-- AUTO_INCREMENT de la tabla `pedidos_productos`
+--
+ALTER TABLE `pedidos_productos`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=36;
 
 --
 -- AUTO_INCREMENT de la tabla `productos`
 --
 ALTER TABLE `productos`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
 
 --
 -- AUTO_INCREMENT de la tabla `roles`
@@ -383,7 +437,7 @@ ALTER TABLE `roles`
 -- AUTO_INCREMENT de la tabla `tickets`
 --
 ALTER TABLE `tickets`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- Restricciones para tablas volcadas

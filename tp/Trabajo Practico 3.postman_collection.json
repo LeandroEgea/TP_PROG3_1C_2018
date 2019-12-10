@@ -1,0 +1,1088 @@
+{
+	"info": {
+		"_postman_id": "63446707-20af-4bf6-8834-a1a4eaf616f9",
+		"name": "Trabajo Practico 3",
+		"description": "Request para  el TP3 API-Comanda de Programacion III",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Mesas",
+			"item": [
+				{
+					"name": "MOSTRAR TODOS",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"url": {
+							"raw": "{{localhost}}/mesas/",
+							"host": [
+								"{{localhost}}"
+							],
+							"path": [
+								"mesas",
+								""
+							]
+						},
+						"description": "Traer Todos los usuarios de la base de datos"
+					},
+					"response": []
+				},
+				{
+					"name": "MOSTRAR UNO",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"url": {
+							"raw": "{{localhost}}/mesas/get/MSA05",
+							"host": [
+								"{{localhost}}"
+							],
+							"path": [
+								"mesas",
+								"get",
+								"MSA05"
+							]
+						},
+						"description": "Traer un usuario por ID de la base de datos"
+					},
+					"response": []
+				},
+				{
+					"name": "ALTA",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "token",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"url": {
+							"raw": "{{localhost}}/mesas/",
+							"host": [
+								"{{localhost}}"
+							],
+							"path": [
+								"mesas",
+								""
+							]
+						},
+						"description": "Alta de un usuario a la base de datos"
+					},
+					"response": []
+				},
+				{
+					"name": "BAJA",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "token",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"url": {
+							"raw": "{{localhost}}/mesas/MSA06",
+							"host": [
+								"{{localhost}}"
+							],
+							"path": [
+								"mesas",
+								"MSA06"
+							]
+						},
+						"description": "Baja de un usuario por ID de la base de datos"
+					},
+					"response": []
+				},
+				{
+					"name": "Libre",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"url": {
+							"raw": "{{localhost}}/mesas/libre",
+							"host": [
+								"{{localhost}}"
+							],
+							"path": [
+								"mesas",
+								"libre"
+							]
+						},
+						"description": "Alta de un usuario a la base de datos"
+					},
+					"response": []
+				}
+			],
+			"description": "ABM de Usuarios",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "4103b1f9-2941-4ffc-9cdf-a87cc34d9304",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "814fd6a1-de1d-4cba-9737-0f1c6a2cef9c",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Encargados",
+			"item": [
+				{
+					"name": "MOSTRAR TODOS",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "token",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"url": {
+							"raw": "{{localhost}}/encargados/",
+							"host": [
+								"{{localhost}}"
+							],
+							"path": [
+								"encargados",
+								""
+							]
+						},
+						"description": "Traer Todos los usuarios de la base de datos"
+					},
+					"response": []
+				},
+				{
+					"name": "MOSTRAR UNO",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "token",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "email",
+									"value": "sarasa@mail.com",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "legajo",
+									"value": "1023",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "clave",
+									"value": "secretaz",
+									"type": "text",
+									"disabled": true
+								}
+							]
+						},
+						"url": {
+							"raw": "{{localhost}}/encargados/get/17",
+							"host": [
+								"{{localhost}}"
+							],
+							"path": [
+								"encargados",
+								"get",
+								"17"
+							]
+						},
+						"description": "Traer un usuario por ID de la base de datos"
+					},
+					"response": []
+				},
+				{
+					"name": "Login",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "token",
+								"type": "text",
+								"value": "{{token}}"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "usuario",
+									"value": "mozog",
+									"type": "text"
+								},
+								{
+									"key": "clave",
+									"value": "pass",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{localhost}}/encargados/login",
+							"host": [
+								"{{localhost}}"
+							],
+							"path": [
+								"encargados",
+								"login"
+							]
+						},
+						"description": "Alta de un usuario a la base de datos"
+					},
+					"response": []
+				},
+				{
+					"name": "ALTA",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "token",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "nombre",
+									"value": "Mozo",
+									"type": "text"
+								},
+								{
+									"key": "apellido",
+									"value": "Gomez",
+									"type": "text"
+								},
+								{
+									"key": "clave",
+									"value": "pass",
+									"type": "text"
+								},
+								{
+									"key": "idRol",
+									"value": "5",
+									"type": "text"
+								},
+								{
+									"key": "usuario",
+									"value": "mozog",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{localhost}}/encargados/",
+							"host": [
+								"{{localhost}}"
+							],
+							"path": [
+								"encargados",
+								""
+							]
+						},
+						"description": "Alta de un usuario a la base de datos"
+					},
+					"response": []
+				},
+				{
+					"name": "BAJA",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "token",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"url": {
+							"raw": "{{localhost}}/encargados/55",
+							"host": [
+								"{{localhost}}"
+							],
+							"path": [
+								"encargados",
+								"55"
+							]
+						},
+						"description": "Baja de un usuario por ID de la base de datos"
+					},
+					"response": []
+				},
+				{
+					"name": "MODIFICACION",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "token",
+								"type": "text",
+								"value": "{{token}}"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "idRol",
+									"value": "5",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{localhost}}/encargados/put/38",
+							"host": [
+								"{{localhost}}"
+							],
+							"path": [
+								"encargados",
+								"put",
+								"38"
+							]
+						},
+						"description": "Modificacion de un usuario de la base de dato"
+					},
+					"response": []
+				}
+			],
+			"description": "ABM de Usuarios",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "4103b1f9-2941-4ffc-9cdf-a87cc34d9304",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "814fd6a1-de1d-4cba-9737-0f1c6a2cef9c",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Productos",
+			"item": [
+				{
+					"name": "MOSTRAR TODOS",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "token",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "email",
+									"value": "sarasa@mail.com",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "legajo",
+									"value": "1023",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "clave",
+									"value": "secretaz",
+									"type": "text",
+									"disabled": true
+								}
+							]
+						},
+						"url": {
+							"raw": "{{localhost}}/productos/",
+							"host": [
+								"{{localhost}}"
+							],
+							"path": [
+								"productos",
+								""
+							]
+						},
+						"description": "Traer Todos los usuarios de la base de datos"
+					},
+					"response": []
+				},
+				{
+					"name": "MOSTRAR UNO",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "token",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"url": {
+							"raw": "{{localhost}}/productos/get/7",
+							"host": [
+								"{{localhost}}"
+							],
+							"path": [
+								"productos",
+								"get",
+								"7"
+							]
+						},
+						"description": "Traer un usuario por ID de la base de datos"
+					},
+					"response": []
+				},
+				{
+					"name": "ALTA",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "token",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "descripcion",
+									"value": "Pollito",
+									"type": "text"
+								},
+								{
+									"key": "precio",
+									"value": "340",
+									"type": "text"
+								},
+								{
+									"key": "idRol",
+									"value": "5",
+									"type": "text"
+								},
+								{
+									"key": "tiempoPreparacion",
+									"value": "24",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{localhost}}/productos/",
+							"host": [
+								"{{localhost}}"
+							],
+							"path": [
+								"productos",
+								""
+							]
+						},
+						"description": "Alta de un usuario a la base de datos"
+					},
+					"response": []
+				},
+				{
+					"name": "MODIFICACION",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "token",
+								"type": "text",
+								"value": "{{token}}"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "descripcion",
+									"value": "Pollo al horno",
+									"type": "text"
+								},
+								{
+									"key": "idRol",
+									"value": "1",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{localhost}}/productos/put/21",
+							"host": [
+								"{{localhost}}"
+							],
+							"path": [
+								"productos",
+								"put",
+								"21"
+							]
+						},
+						"description": "Modificacion de un usuario de la base de dato"
+					},
+					"response": []
+				},
+				{
+					"name": "BAJA",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "token",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"url": {
+							"raw": "{{localhost}}/productos/111",
+							"host": [
+								"{{localhost}}"
+							],
+							"path": [
+								"productos",
+								"111"
+							]
+						},
+						"description": "Baja de un usuario por ID de la base de datos"
+					},
+					"response": []
+				},
+				{
+					"name": "Ver Pendientes",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "token",
+								"type": "text",
+								"value": "{{token}}"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"url": {
+							"raw": "{{localhost}}/productos/pendientes",
+							"host": [
+								"{{localhost}}"
+							],
+							"path": [
+								"productos",
+								"pendientes"
+							]
+						},
+						"description": "Traer un usuario por ID de la base de datos"
+					},
+					"response": []
+				}
+			],
+			"description": "ABM de Usuarios",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "4103b1f9-2941-4ffc-9cdf-a87cc34d9304",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "814fd6a1-de1d-4cba-9737-0f1c6a2cef9c",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Pedidos",
+			"item": [
+				{
+					"name": "MOSTRAR TODOS",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "token",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"url": {
+							"raw": "{{localhost}}/pedidos/",
+							"host": [
+								"{{localhost}}"
+							],
+							"path": [
+								"pedidos",
+								""
+							]
+						},
+						"description": "Traer Todos los usuarios de la base de datos"
+					},
+					"response": []
+				},
+				{
+					"name": "MOSTRAR UNO",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "token",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "email",
+									"value": "sarasa@mail.com",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "legajo",
+									"value": "1023",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "clave",
+									"value": "secretaz",
+									"type": "text",
+									"disabled": true
+								}
+							]
+						},
+						"url": {
+							"raw": "{{localhost}}/pedidos/get/Lm9BZ",
+							"host": [
+								"{{localhost}}"
+							],
+							"path": [
+								"pedidos",
+								"get",
+								"Lm9BZ"
+							]
+						},
+						"description": "Traer un usuario por ID de la base de datos"
+					},
+					"response": []
+				},
+				{
+					"name": "ALTA",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "token",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "nombreCliente",
+									"value": "Rodolfo",
+									"type": "text"
+								},
+								{
+									"key": "imagen",
+									"type": "file",
+									"src": "/C:/Users/leandro/Desktop/relaciones.jpg"
+								},
+								{
+									"key": "productos",
+									"value": "1,7,7,8,14,15",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{localhost}}/pedidos/",
+							"host": [
+								"{{localhost}}"
+							],
+							"path": [
+								"pedidos",
+								""
+							]
+						},
+						"description": "Alta de un usuario a la base de datos"
+					},
+					"response": []
+				},
+				{
+					"name": "BAJA",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "token",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"url": {
+							"raw": "{{localhost}}/pedidos/2",
+							"host": [
+								"{{localhost}}"
+							],
+							"path": [
+								"pedidos",
+								"2"
+							]
+						},
+						"description": "Baja de un usuario por ID de la base de datos"
+					},
+					"response": []
+				},
+				{
+					"name": "MODIFICACION",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "token",
+								"type": "text",
+								"value": "{{token}}"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "productos",
+									"value": "7",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{localhost}}/pedidos/put/60S4z",
+							"host": [
+								"{{localhost}}"
+							],
+							"path": [
+								"pedidos",
+								"put",
+								"60S4z"
+							]
+						},
+						"description": "Modificacion de un usuario de la base de dato"
+					},
+					"response": []
+				},
+				{
+					"name": "Preparar",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "token",
+								"type": "text",
+								"value": "{{token}}"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"url": {
+							"raw": "{{localhost}}/pedidos/preparar/60S4z",
+							"host": [
+								"{{localhost}}"
+							],
+							"path": [
+								"pedidos",
+								"preparar",
+								"60S4z"
+							]
+						},
+						"description": "Alta de un usuario a la base de datos"
+					},
+					"response": []
+				},
+				{
+					"name": "Terminar",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "token",
+								"type": "text",
+								"value": "{{token}}"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"url": {
+							"raw": "{{localhost}}/pedidos/terminar/60S4z",
+							"host": [
+								"{{localhost}}"
+							],
+							"path": [
+								"pedidos",
+								"terminar",
+								"60S4z"
+							]
+						},
+						"description": "Alta de un usuario a la base de datos"
+					},
+					"response": []
+				},
+				{
+					"name": "Servir",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "token",
+								"type": "text",
+								"value": "{{token}}"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"url": {
+							"raw": "{{localhost}}/pedidos/servir/60S4z",
+							"host": [
+								"{{localhost}}"
+							],
+							"path": [
+								"pedidos",
+								"servir",
+								"60S4z"
+							]
+						},
+						"description": "Alta de un usuario a la base de datos"
+					},
+					"response": []
+				},
+				{
+					"name": "Cuenta",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "token",
+								"type": "text",
+								"value": "{{token}}"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"url": {
+							"raw": "{{localhost}}/pedidos/cuenta/60S4z",
+							"host": [
+								"{{localhost}}"
+							],
+							"path": [
+								"pedidos",
+								"cuenta",
+								"60S4z"
+							]
+						},
+						"description": "Alta de un usuario a la base de datos"
+					},
+					"response": []
+				},
+				{
+					"name": "Cobrar",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "token",
+								"type": "text",
+								"value": "{{token}}"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"url": {
+							"raw": "{{localhost}}/pedidos/cobrar/60S4z",
+							"host": [
+								"{{localhost}}"
+							],
+							"path": [
+								"pedidos",
+								"cobrar",
+								"60S4z"
+							]
+						},
+						"description": "Alta de un usuario a la base de datos"
+					},
+					"response": []
+				}
+			],
+			"description": "ABM de Usuarios",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "4103b1f9-2941-4ffc-9cdf-a87cc34d9304",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "814fd6a1-de1d-4cba-9737-0f1c6a2cef9c",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			],
+			"protocolProfileBehavior": {}
+		}
+	],
+	"protocolProfileBehavior": {}
+}
